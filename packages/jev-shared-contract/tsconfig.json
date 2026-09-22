@@ -9,7 +9,11 @@
     "strict": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
-    "forceConsistentCasingInFileNames": true
+    "forceConsistentCasingInFileNames": true,
+    "typeRoots": [
+      "../../projects/jev-browser-cli/node_modules/@types",
+      "./node_modules/@types"
+    ]
   },
   "include": ["src/**/*"]
 }

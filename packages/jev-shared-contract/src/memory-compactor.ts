@@ -8,6 +8,8 @@
  * - isEphemeralNoise (Noul): Is this turn disposable chit-chat or temporary logging?
  */
 
+import { estimateTokens } from "./token-estimator.js";
+
 export interface ChatMessageTurn {
   id: string;
   role: "system" | "user" | "assistant" | "tool";
@@ -69,7 +71,7 @@ export class JevMemoryCompactor {
 
     let totalTokens = 0;
     for (const turn of turns) {
-      turn.tokenEstimate = turn.tokenEstimate || Math.ceil(turn.content.length / 4);
+      turn.tokenEstimate = turn.tokenEstimate || estimateTokens(turn.content);
       totalTokens += turn.tokenEstimate;
     }
 

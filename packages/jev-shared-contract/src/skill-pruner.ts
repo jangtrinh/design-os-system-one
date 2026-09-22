@@ -5,6 +5,9 @@
  * for explicitly invoked/mandatory skills, and schema token reduction >80%.
  */
 
+import { TwoTierPersistentCache, TwoTierCacheOptions } from "./cache-storage.js";
+import { limitConcurrency } from "./concurrency.js";
+
 export interface SkillManifestItem {
   name: string;
   description: string;
@@ -15,6 +18,7 @@ export interface SkillManifestItem {
 export interface SkillPrunerPolicy {
   includeProbability: number; // default 0.60
   maxOptionalSkills: number;  // default 4
+  concurrency?: number;       // default 8
 }
 
 export interface SkillRelevance {
@@ -41,12 +45,28 @@ export interface SkillPrunerResult {
   cacheHit: boolean;
 }
 
+export interface SkillPrunerOptions {
+  cache?: TwoTierPersistentCache<SkillPrunerResult>;
+  diskCachePath?: string;
+  enableDiskCache?: boolean;
+}
+
 export class JevSkillPruner {
-  private cache = new Map<string, SkillPrunerResult>();
+  private cache: TwoTierPersistentCache<SkillPrunerResult>;
   private defaultPolicy: SkillPrunerPolicy = {
     includeProbability: 0.60,
     maxOptionalSkills: 4,
+    concurrency: 8,
   };
+
+  constructor(options: SkillPrunerOptions = {}) {
+    this.cache =
+      options.cache ||
+      new TwoTierPersistentCache<SkillPrunerResult>({
+        diskPath: options.diskCachePath,
+        autoPersistOnSet: options.enableDiskCache ?? (options.diskCachePath ? true : false),
+      });
+  }
 
   /**
    * Generates a stable hash key for caching.
@@ -85,7 +105,7 @@ export class JevSkillPruner {
       .filter((w) => w.length > 2);
 
     const mandatoryList: SkillRelevance[] = [];
-    const optionalCandidates: SkillRelevance[] = [];
+    const candidateSkillsToEvaluate: SkillManifestItem[] = [];
     const prunedNames: string[] = [];
 
     // 1. Deterministic Bypass Resolution
@@ -104,7 +124,15 @@ export class JevSkillPruner {
           reason: skill.mandatory ? "configuration-mandatory" : "explicitly-invoked",
         });
       } else {
-        // 2. Parallel Noul Judgment Simulation
+        candidateSkillsToEvaluate.push(skill);
+      }
+    }
+
+    // 2. Parallel Noul Judgment Simulation with Concurrency Limiter
+    const optionalCandidates = await limitConcurrency(
+      candidateSkillsToEvaluate,
+      async (skill) => {
+        const skillNameLower = skill.name.toLowerCase();
         const descLower = skill.description.toLowerCase();
         const matches = queryTerms.filter(
           (term) => descLower.includes(term) || skillNameLower.includes(term)
@@ -119,14 +147,15 @@ export class JevSkillPruner {
           probability = 0.65;
         }
 
-        optionalCandidates.push({
+        return {
           name: skill.name,
           probability,
           mandatory: false,
           reason: `keyword-affinity-matches:${matches.length}`,
-        });
-      }
-    }
+        };
+      },
+      policy.concurrency || 8
+    );
 
     // 3. Threshold Filtering & Top-K Policy
     const acceptedOptional = optionalCandidates

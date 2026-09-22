@@ -13,6 +13,8 @@ import {
   Score,
   validateChoiceDistribution,
 } from "./index.js";
+import { estimateTokens } from "./token-estimator.js";
+import { TwoTierPersistentCache } from "./cache-storage.js";
 
 export interface RoutedExecutionPlan {
   planId: string;
@@ -33,15 +35,24 @@ export interface RouterOptions {
   routeModelMap?: Partial<Record<GatewayRoute, string>>;
   minRelevanceThreshold?: number; // 1-4 scale, default 3
   priceMapPer1k?: Partial<Record<GatewayRoute, number>>;
+  cache?: TwoTierPersistentCache<string>;
+  diskCachePath?: string;
+  enableDiskCache?: boolean;
 }
 
 export class JevGatewayRouter {
-  private exactCache = new Map<string, string>();
+  private exactCache: TwoTierPersistentCache<string>;
   private routeModelMap: Record<GatewayRoute, string>;
   private priceMapPer1k: Record<GatewayRoute, number>;
   private minRelevanceThreshold: number;
 
   constructor(options: RouterOptions = {}) {
+    this.exactCache =
+      options.cache ||
+      new TwoTierPersistentCache<string>({
+        diskPath: options.diskCachePath,
+        autoPersistOnSet: options.enableDiskCache ?? (options.diskCachePath ? true : false),
+      });
     this.routeModelMap = {
       small: "gpt-4o-mini",
       reasoning: "gpt-5.6-sol-pro",
@@ -118,7 +129,7 @@ export class JevGatewayRouter {
     const prunedBlockIds: string[] = [];
 
     for (const block of input.blocks) {
-      const blockTokens = block.tokenEstimate || Math.ceil(block.text.length / 4);
+      const blockTokens = block.tokenEstimate || estimateTokens(block.text);
       originalTokens += blockTokens;
 
       const relevance = triageResult.blockRelevance[block.id]?.score ?? 3;

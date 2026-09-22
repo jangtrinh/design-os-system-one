@@ -22,6 +22,8 @@ export type Score = {
   confidence: number;
 };
 
+import { IntentIdentity, createIntentIdentity } from "./identity.js";
+
 export interface Binding {
   scopeHash: string;          // Tenant, principal, resource scope
   intentEpoch: number;        // Epoch counter for stale-decision prevention
@@ -29,6 +31,7 @@ export interface Binding {
   candidateSetHash: string;   // Hash of the enumerated options
   policyVersion: string;      // Current security / prompt policy version
   expiresAtMs: number;        // Absolute deadline timestamp
+  identity?: IntentIdentity;  // Distributed identity across machines/nodes
 }
 
 export interface Input<T> {
@@ -152,14 +155,25 @@ export function createBinding(params: {
   candidateSetHash?: string;
   policyVersion?: string;
   ttlMs?: number;
+  identity?: IntentIdentity;
 }): Binding {
+  const scopeHash = params.scopeHash || "global_scope";
+  const bindingHash = `${scopeHash}:${params.stateHash}:${params.candidateSetHash || "default"}`;
+  const identity =
+    params.identity ||
+    createIntentIdentity({
+      epoch: params.intentEpoch,
+      bindingHash,
+    });
+
   return {
-    scopeHash: params.scopeHash || "global_scope",
+    scopeHash,
     intentEpoch: params.intentEpoch,
     stateHash: params.stateHash,
     candidateSetHash: params.candidateSetHash || "default_candidates",
     policyVersion: params.policyVersion || "v1.0.0",
     expiresAtMs: Date.now() + (params.ttlMs || 10000),
+    identity,
   };
 }
 
@@ -235,3 +249,11 @@ export * from "./stop-oracle.js";
 // Milestone 5: Smart Rolling Memory Compactor
 // -------------------------------------------------------------
 export * from "./memory-compactor.js";
+
+// -------------------------------------------------------------
+// Milestone 6: Production Hardening & Global Resilience
+// -------------------------------------------------------------
+export * from "./token-estimator.js";
+export * from "./identity.js";
+export * from "./cache-storage.js";
+export * from "./concurrency.js";

@@ -8,6 +8,9 @@
  *                                           RECONCILING
  */
 
+import * as fs from 'fs';
+import * as path from 'path';
+import * as os from 'os';
 import { Binding, Result } from './contract.js';
 
 export type CommitState =
@@ -35,6 +38,8 @@ export interface CommitTransaction<T> {
 
 export interface CommitEngineOptions {
   dispatchTimeoutMs?: number;
+  enableJournaling?: boolean;
+  journalPath?: string;
 }
 
 export class CommitEngine {
@@ -43,9 +48,86 @@ export class CommitEngine {
   private activeLease: { holderTxId: string; fencingToken: number } | null = null;
   private fencingSeq = 0;
   private dispatchTimeoutMs: number;
+  private enableJournaling: boolean;
+  private journalPath: string;
 
   constructor(options: CommitEngineOptions = {}) {
     this.dispatchTimeoutMs = options.dispatchTimeoutMs || 5000;
+    this.enableJournaling = options.enableJournaling ?? false;
+    this.journalPath =
+      options.journalPath || path.join(os.homedir(), '.jev', 'intent-journal.json');
+  }
+
+  /**
+   * Appends an in-flight transaction to disk journal prior to side-effect dispatch.
+   */
+  private appendJournal(tx: CommitTransaction<any>): void {
+    if (!this.enableJournaling) return;
+    try {
+      const dir = path.dirname(this.journalPath);
+      if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+      let list: CommitTransaction<any>[] = [];
+      if (fs.existsSync(this.journalPath)) {
+        try {
+          list = JSON.parse(fs.readFileSync(this.journalPath, 'utf-8')) || [];
+        } catch {}
+      }
+      list.push(tx);
+      const tmpPath = `${this.journalPath}.tmp.${Date.now()}`;
+      fs.writeFileSync(tmpPath, JSON.stringify(list, null, 2), 'utf-8');
+      fs.renameSync(tmpPath, this.journalPath);
+    } catch {}
+  }
+
+  /**
+   * Updates state of an existing transaction in disk journal.
+   */
+  private updateJournal(tx: CommitTransaction<any>): void {
+    if (!this.enableJournaling) return;
+    try {
+      if (!fs.existsSync(this.journalPath)) return;
+      let list: CommitTransaction<any>[] =
+        JSON.parse(fs.readFileSync(this.journalPath, 'utf-8')) || [];
+      const idx = list.findIndex((item) => item.txId === tx.txId);
+      if (idx !== -1) {
+        list[idx] = tx;
+      } else {
+        list.push(tx);
+      }
+      const tmpPath = `${this.journalPath}.tmp.${Date.now()}`;
+      fs.writeFileSync(tmpPath, JSON.stringify(list, null, 2), 'utf-8');
+      fs.renameSync(tmpPath, this.journalPath);
+    } catch {}
+  }
+
+  /**
+   * Scans journal for unresolved/in-flight intents requiring reconciliation on restart.
+   */
+  recoverPendingIntents(): CommitTransaction<any>[] {
+    if (!fs.existsSync(this.journalPath)) return [];
+    try {
+      const list: CommitTransaction<any>[] =
+        JSON.parse(fs.readFileSync(this.journalPath, 'utf-8')) || [];
+      return list.filter(
+        (item) =>
+          item.state === 'DISPATCHING' ||
+          item.state === 'UNCERTAIN' ||
+          item.state === 'PREPARED'
+      );
+    } catch {
+      return [];
+    }
+  }
+
+  /**
+   * Clears the intent journal.
+   */
+  clearJournal(): void {
+    if (fs.existsSync(this.journalPath)) {
+      try {
+        fs.unlinkSync(this.journalPath);
+      } catch {}
+    }
   }
 
   getEpoch(): number {
@@ -168,6 +250,7 @@ export class CommitEngine {
     // Stage 4: DISPATCHING - Execute side effect
     tx.state = 'DISPATCHING';
     tx.dispatchedAtMs = Date.now();
+    this.appendJournal(tx);
 
     let dispatchResult: T;
     try {
@@ -185,25 +268,30 @@ export class CommitEngine {
         // Crucial Architectural Rule: Timeout after dispatch is UNCERTAIN, NOT failed!
         tx.state = 'UNCERTAIN';
         tx.reason = 'Transport timeout after dispatch: effect may have taken place on page/server';
+        this.updateJournal(tx);
 
         if (reconcileFn) {
           tx.state = 'RECONCILING';
+          this.updateJournal(tx);
           try {
             const confirmed = await reconcileFn();
             if (confirmed) {
               tx.state = 'CONFIRMED';
               tx.completedAtMs = Date.now();
+              this.updateJournal(tx);
               return tx;
             }
           } catch (reconcileErr: any) {
             tx.reason += ` (Reconciliation error: ${reconcileErr.message})`;
           }
         }
+        this.updateJournal(tx);
         return tx;
       }
 
       tx.state = 'ABORTED';
       tx.reason = `Dispatch error: ${err.message}`;
+      this.updateJournal(tx);
       return tx;
     }
 
@@ -215,6 +303,7 @@ export class CommitEngine {
           this.releaseLease(lease);
           tx.state = 'UNCERTAIN';
           tx.reason = 'Postcondition verification failed: unexpected DOM state after action';
+          this.updateJournal(tx);
           return tx;
         }
       }
@@ -222,11 +311,13 @@ export class CommitEngine {
       this.releaseLease(lease);
       tx.state = 'CONFIRMED';
       tx.completedAtMs = Date.now();
+      this.updateJournal(tx);
       return tx;
     } catch (err: any) {
       this.releaseLease(lease);
       tx.state = 'UNCERTAIN';
       tx.reason = `Postcondition check threw error: ${err.message}`;
+      this.updateJournal(tx);
       return tx;
     }
   }
