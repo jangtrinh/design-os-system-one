@@ -230,3 +230,8 @@ export * from "./router.js";
 // -------------------------------------------------------------
 export * from "./skill-pruner.js";
 export * from "./stop-oracle.js";
+
+// -------------------------------------------------------------
+// Milestone 5: Smart Rolling Memory Compactor
+// -------------------------------------------------------------
+export * from "./memory-compactor.js";
