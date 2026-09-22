@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="vi" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>JEV Voice Browser Agent</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div class="app-container">
+    <!-- Navbar -->
+    <header class="navbar">
+      <div class="brand">
+        <div class="logo-badge">JEV</div>
+        <div class="brand-text">
+          <h1>Voice Browser Agent</h1>
+          <span class="subtext">TypeSafe AI System One • Real-time Automation</span>
+        </div>
+      </div>
+
+      <div class="nav-controls">
+        <div class="browser-address-box">
+          <span class="dot" id="connection-dot"></span>
+          <span class="url-text" id="current-url">about:blank</span>
+        </div>
+
+        <div class="actions">
+          <select id="lang-select" class="btn-select" title="Ngôn ngữ nhận dạng giọng nói">
+            <option value="vi-VN" selected>🇻🇳 Tiếng Việt</option>
+            <option value="en-US">🇺🇸 English</option>
+          </select>
+
+          <button id="tts-toggle-btn" class="btn-secondary active" title="Bật/Tắt phản hồi bằng giọng nói của Agent">
+            <span class="icon">🔊</span>
+            <span id="tts-status-text">Loa: BẬT</span>
+          </button>
+
+          <button id="toggle-headful-btn" class="btn-secondary" title="Bật/Tắt cửa sổ trình duyệt Chromium thật trên màn hình">
+            <span class="icon">🪟</span>
+            <span id="headful-status-text">Cửa Sổ Thật: BẬT</span>
+          </button>
+
+          <button id="api-key-btn" class="btn-secondary" title="Cài đặt TYPESAFE_API_KEY">
+            <span class="icon">🔑</span>
+            <span id="api-status-badge">JEV Live</span>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main Grid -->
+    <main class="main-layout">
+      <!-- Cột Trái: Voice & Jev Inspector -->
+      <section class="left-panel">
+        <!-- Voice Hub Card -->
+        <div class="card voice-card">
+          <div class="card-header">
+            <h2>Microphone & Voice Control</h2>
+            <span class="status-pill" id="mic-status-pill">Sẵn sàng</span>
+          </div>
+
+          <div class="mic-hub">
+            <button id="mic-btn" class="mic-button" title="Bấm để nói hoặc tắt micro">
+              <div class="mic-wave-ring"></div>
+              <svg class="mic-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"></path>
+                <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
+                <line x1="12" y1="19" x2="12" y2="22"></line>
+              </svg>
+            </button>
+            <canvas id="audio-visualizer" class="audio-canvas" width="280" height="36"></canvas>
+            <p class="mic-hint" id="mic-hint">Bấm Micro và nói câu lệnh (hoặc bấm nút thử bên dưới)</p>
+            <button id="test-mic-btn" class="btn-secondary" style="margin-top: 8px; font-size: 12px; padding: 5px 12px; border-radius: 20px; border: 1px solid var(--border); background: var(--bg-card); color: var(--text-muted); cursor: pointer; transition: all 0.2s;" title="Kiểm tra xem Microphone và Web Speech API có hoạt động trên máy của bạn không">🔍 Chẩn Đoán Micro</button>
+          </div>
+
+          <!-- Transcript Live Box -->
+          <div class="transcript-box">
+            <div class="transcript-header">
+              <span>Nội dung nhận diện thời gian thực:</span>
+              <span class="lang-tag" id="current-lang-tag">vi-VN</span>
+            </div>
+            <div class="transcript-content" id="transcript-text">"Chưa có câu lệnh nào..."</div>
+          </div>
+
+          <!-- One-Click Voice Simulation Chips -->
+          <div class="quick-commands">
+            <span class="label">Bấm để chạy thử ngay lệnh giọng nói:</span>
+            <div class="tag-list">
+              <button class="tag primary" data-cmd="mở trang vnexpress.net">🌐 "Mở vnexpress.net"</button>
+              <button class="tag" data-cmd="mở youtube.com">▶️ "Mở youtube.com"</button>
+              <button class="tag" data-cmd="click vào bài báo đầu tiên">👆 "Click bài đầu tiên"</button>
+              <button class="tag" data-cmd="cuộn xuống dưới">⬇️ "Cuộn xuống"</button>
+              <button class="tag" data-cmd="cuộn lên trên">⬆️ "Cuộn lên"</button>
+              <button class="tag" data-cmd="quay lại trang trước">⬅️ "Quay lại"</button>
+              <button class="tag" data-cmd="tải lại trang">🔄 "Tải lại trang"</button>
+            </div>
+          </div>
+
+          <!-- Manual input fallback -->
+          <form id="manual-form" class="manual-input-box">
+            <input type="text" id="manual-input" placeholder="Gõ câu lệnh bất kỳ (vd: mở google, click tìm kiếm)..." />
+            <button type="submit" class="btn-primary">Gửi Lệnh</button>
+          </form>
+        </div>
+
+        <!-- Jev System One Inspector Card -->
+        <div class="card inspector-card">
+          <div class="card-header">
+            <h2>Jev Inspector (System One Decision)</h2>
+            <span class="latency-badge" id="jev-latency">0 ms</span>
+          </div>
+
+          <div class="inspector-body">
+            <div class="decision-row">
+              <div class="metric">
+                <span class="label">Ý Định Phân Loại</span>
+                <span class="value intent-val" id="decision-intent">-</span>
+              </div>
+              <div class="metric">
+                <span class="label">Độ Tin Cậy (Confidence)</span>
+                <div class="confidence-container">
+                  <span class="value" id="decision-confidence">0%</span>
+                  <div class="confidence-bar-bg">
+                    <div class="confidence-bar-fill" id="confidence-bar"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="metric-full">
+              <span class="label">Phần Tử / URL Mục Tiêu</span>
+              <div class="target-box" id="decision-target">Chưa có quyết định</div>
+            </div>
+
+            <div class="metric-full">
+              <span class="label">Phân Phối Xác Suất Toán Học (Probabilities)</span>
+              <div class="prob-list" id="prob-list">
+                <div class="prob-empty">Chưa có dữ liệu đánh giá</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Activity Feed -->
+        <div class="card log-card">
+          <div class="card-header">
+            <h2>Nhật Ký Thực Thi (Activity Log)</h2>
+            <button id="clear-log-btn" class="btn-text">Xóa Log</button>
+          </div>
+          <div class="log-stream" id="log-stream">
+            <div class="log-entry info">Hệ thống sẵn sàng tiếp nhận giọng nói.</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Cột Phải: Live Browser Screencast Preview -->
+      <section class="right-panel">
+        <div class="card browser-view-card">
+          <div class="browser-toolbar">
+            <div class="window-controls">
+              <span class="circle red"></span>
+              <span class="circle yellow"></span>
+              <span class="circle green"></span>
+            </div>
+            <div class="page-title-box" id="page-title-display">Đang kết nối Chromium...</div>
+            <div class="element-counter">
+              <span class="badge" id="elements-count">0 phần tử tương tác</span>
+            </div>
+          </div>
+
+          <div class="browser-screen-frame">
+            <img id="browser-screencast" src="" alt="Live Browser View" />
+            <div class="loading-overlay" id="loading-overlay">
+              <div class="spinner"></div>
+              <span id="loading-msg">Đang kết nối tới Playwright Chromium...</span>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- Modal Cài Đặt API Key -->
+    <div class="modal-backdrop" id="api-modal">
+      <div class="modal-dialog">
+        <div class="modal-header">
+          <h3>Cấu Hình TYPESAFE_API_KEY</h3>
+          <button class="close-btn" id="close-modal-btn">&times;</button>
+        </div>
+        <div class="modal-body">
+          <p>Nhập khóa API từ <a href="https://console.typesafe.ai" target="_blank">console.typesafe.ai</a> để kết nối trực tiếp mô hình <strong>Jev 1.13</strong>:</p>
+          <input type="password" id="api-key-input" placeholder="ts_live_..." />
+          <p class="note">Mẹo: Khóa API cũng có thể được nạp tự động qua file <code>.env</code> ở thư mục gốc.</p>
+        </div>
+        <div class="modal-footer">
+          <button class="btn-secondary" id="cancel-modal-btn">Hủy</button>
+          <button class="btn-primary" id="save-api-key-btn">Lưu Khóa API</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

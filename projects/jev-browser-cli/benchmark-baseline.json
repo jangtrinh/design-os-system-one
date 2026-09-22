@@ -1,0 +1,34 @@
+{
+  "timestamp": "2026-09-22T02:53:44.975Z",
+  "iterations": 10,
+  "latencies": [
+    1619,
+    961,
+    341,
+    310,
+    431,
+    436,
+    1229,
+    350,
+    497,
+    406
+  ],
+  "percentiles": {
+    "min": 310,
+    "max": 1619,
+    "mean": 658,
+    "p50": 431,
+    "p95": 1619,
+    "p99": 1619
+  },
+  "tokens": {
+    "totalPromptTokens": 16100,
+    "totalCompletionTokens": 1010,
+    "avgTokensPerCall": 1711
+  },
+  "economics": {
+    "jevEstimatedCostUsd": 0.001,
+    "autoregressiveLlmLikelyCostUsd": 0.05,
+    "costReductionPct": 98
+  }
+}

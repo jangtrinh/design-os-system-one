@@ -1,0 +1,17 @@
+{
+  "name": "@jev/shared-contract",
+  "version": "1.0.0",
+  "description": "Universal TypeSafe JEV System One Decision Contract & Runtime Validator for VSF-PCP, Browser CLI, and TheCurator",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "test": "tsx --test test/*.test.ts"
+  },
+  "devDependencies": {
+    "@types/node": "^20.12.12",
+    "tsx": "^4.10.5",
+    "typescript": "^5.4.5"
+  }
+}
