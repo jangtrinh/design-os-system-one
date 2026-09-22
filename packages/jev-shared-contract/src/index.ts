@@ -224,3 +224,9 @@ export function validateResult<T>(
 // Universal LLM Gateway & Context Pruning Router
 // -------------------------------------------------------------
 export * from "./router.js";
+
+// -------------------------------------------------------------
+// Milestone 4: Dynamic Skill Pruner & Stop-Condition Oracle
+// -------------------------------------------------------------
+export * from "./skill-pruner.js";
+export * from "./stop-oracle.js";
