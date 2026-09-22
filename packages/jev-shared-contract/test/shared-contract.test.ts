@@ -52,3 +52,25 @@ test("Shared Contract: validates gateway routing payload", () => {
   const resCheck = validateResult(result, 1);
   assert.equal(resCheck.valid, true);
 });
+
+test("JevGatewayRouter: prunes context and routes model tier globally", async () => {
+  const { JevGatewayRouter } = await import("../src/index.js");
+  const router = new JevGatewayRouter();
+
+  const plan = await router.route({
+    request: "How to configure PostgreSQL connection pool?",
+    eligibleRoutes: ["small", "reasoning", "review"],
+    cacheCandidates: [],
+    blocks: [
+      { id: "b1", text: "Database connection pool settings for PostgreSQL", mandatory: false, tokenEstimate: 100 },
+      { id: "b2", text: "Unrelated recipes for cooking Italian pasta", mandatory: false, tokenEstimate: 400 },
+    ],
+  });
+
+  assert.equal(plan.selectedRoute, "small");
+  assert.equal(plan.recommendedModel, "gpt-4o-mini");
+  assert.ok(plan.retainedBlockIds.includes("b1"));
+  assert.ok(plan.prunedBlockIds.includes("b2"));
+  assert.equal(plan.tokensSaved, 400);
+  assert.equal(plan.tokenReductionPct, 80);
+});

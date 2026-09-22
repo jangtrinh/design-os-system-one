@@ -219,3 +219,8 @@ export function validateResult<T>(
 
   return { valid: true };
 }
+
+// -------------------------------------------------------------
+// Universal LLM Gateway & Context Pruning Router
+// -------------------------------------------------------------
+export * from "./router.js";
