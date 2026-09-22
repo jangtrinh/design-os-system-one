@@ -131,6 +131,13 @@ export class JevMemoryCompactor {
       // Decision indicators: architectural invariants, requirements, constraints, API specifications
       const hasDecision =
         textLower.includes("quyết định") ||
+        textLower.includes("quy định") ||
+        textLower.includes("bảo mật") ||
+        textLower.includes("chính sách") ||
+        textLower.includes("policy") ||
+        textLower.includes("security") ||
+        textLower.includes("constraint") ||
+        textLower.includes("tiêu chuẩn") ||
         textLower.includes("architect") ||
         textLower.includes("rule") ||
         textLower.includes("chốt") ||
