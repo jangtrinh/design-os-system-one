@@ -44,12 +44,26 @@ export class FastEvaluator {
     // 2. Select top actionable candidates (up to 25 items)
     const topCandidates = this.rankAndFilterElements(goal, elements);
 
-    // 3. Try fast JEV System One decision if client is available with timeout
+    // 3. Local-First Cascade: Try ultra-fast Local Laya (MLX/REST @ http://127.0.0.1:8000) first (< 15ms)
+    if (topCandidates.length > 0) {
+      try {
+        const layaDecision = await this.evaluateWithLocalLaya(goal, url, title, topCandidates);
+        // Cascade Threshold: if confidence >= 0.30, resolve locally at $0 cost and < 15ms
+        if (layaDecision && layaDecision.confidence >= 0.30) {
+          layaDecision.latencyMs = Date.now() - startTime;
+          return layaDecision;
+        }
+      } catch {
+        // Fallback to JEV Cloud
+      }
+    }
+
+    // 4. Escalation: Call TypeSafe JEV System One Cloud API when local confidence < 0.30 or unavailable
     if (this.client && topCandidates.length > 0) {
       try {
         const jevDecision = await Promise.race([
           this.evaluateWithJevSystemOne(goal, url, title, topCandidates),
-          new Promise<null>((_, reject) => setTimeout(() => reject(new Error("JEV timeout")), 180)),
+          new Promise<null>((_, reject) => setTimeout(() => reject(new Error("JEV timeout")), 250)),
         ]);
 
         if (jevDecision) {
@@ -248,6 +262,109 @@ export class FastEvaluator {
       rationale: "No immediate element matched; scrolling down to reveal more content",
       latencyMs: 0,
     };
+  }
+
+  private async evaluateWithLocalLaya(
+    goal: string,
+    url: string,
+    title: string,
+    candidates: InteractiveElement[]
+  ): Promise<EvaluatorAction | null> {
+    const candidateSummary = candidates
+      .slice(0, 15)
+      .map((c) => `#${c.id} [${c.tag}] "${c.text || c.placeholder || ""}"`)
+      .join("\n");
+
+    const criteria: Record<string, string> = {};
+    for (const c of candidates.slice(0, 15)) {
+      criteria[`item_${c.id}`] = `Interact with #${c.id} [${c.tag}] "${c.text || c.placeholder || ""}"`;
+    }
+    criteria["scroll_down"] = "Scroll down to find more content matching the goal.";
+    criteria["done"] = "The goal has already been fully satisfied.";
+
+    const body = JSON.stringify({
+      state: `Goal: "${goal}"\nPage URL: "${url}"\nPage Title: "${title}"\nInteractive Candidates:\n${candidateSummary}`,
+      questions: {
+        action_decision: {
+          type: "choice",
+          instructions: "Select the single best next action to advance toward the goal.",
+          criteria,
+        },
+      },
+    });
+
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 60);
+
+    try {
+      const resp = await fetch("http://127.0.0.1:8000/predict", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body,
+        signal: controller.signal,
+      });
+      clearTimeout(timeoutId);
+
+      if (!resp.ok) return null;
+      const data = (await resp.json()) as any;
+      const answer = data?.answers?.action_decision;
+      if (!answer) return null;
+
+      const choice = answer.choice || "";
+      const confidence = typeof answer.confidence === "number" ? answer.confidence : 0.85;
+
+      if (choice === "done") {
+        return {
+          action: "done",
+          confidence,
+          rationale: `Laya Local MLX/Edge resolved goal as satisfied (${confidence.toFixed(2)})`,
+          latencyMs: 0,
+        };
+      }
+
+      if (choice === "scroll_down") {
+        return {
+          action: "scroll_down",
+          confidence,
+          rationale: `Laya Local MLX/Edge decided to scroll down (${confidence.toFixed(2)})`,
+          latencyMs: 0,
+        };
+      }
+
+      if (choice.startsWith("item_")) {
+        const targetId = choice.replace("item_", "");
+        const matchedEl = candidates.find((c) => c.id === targetId);
+        if (matchedEl) {
+          if (matchedEl.isInput) {
+            const extractedText = this.extractValueToType(goal);
+            return {
+              action: "type",
+              targetElementId: matchedEl.id,
+              targetElementText: matchedEl.text || matchedEl.placeholder,
+              selector: matchedEl.selector,
+              value: extractedText,
+              confidence,
+              rationale: `Laya Local MLX/Edge selected input #${matchedEl.id} (${confidence.toFixed(2)})`,
+              latencyMs: 0,
+            };
+          } else {
+            return {
+              action: "click",
+              targetElementId: matchedEl.id,
+              targetElementText: matchedEl.text,
+              selector: matchedEl.selector,
+              confidence,
+              rationale: `Laya Local MLX/Edge selected click #${matchedEl.id} (${confidence.toFixed(2)})`,
+              latencyMs: 0,
+            };
+          }
+        }
+      }
+      return null;
+    } catch {
+      clearTimeout(timeoutId);
+      return null;
+    }
   }
 
   private checkGoalCompleted(
