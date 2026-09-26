@@ -10,6 +10,11 @@ baseurl: /design-os-system-one
 lang: en
 repository: jangtrinh/design-os-system-one
 repository_url: https://github.com/jangtrinh/design-os-system-one
+author:
+  name: "Jang Trịnh"
+  twitter: jangtrinh
+twitter:
+  username: jangtrinh
 wordmark: JANGTRINH
 wordmark_url: https://github.com/jangtrinh
 eyebrow: AGENTIC SYSTEM 1 · DUAL-BRAIN ARCHITECTURE          # short product family label, e.g. design:os

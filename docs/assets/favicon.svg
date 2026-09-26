@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <defs>
+    <linearGradient id="jBgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#222226" />
+      <stop offset="100%" stop-color="#141416" />
+    </linearGradient>
+    <linearGradient id="dotGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#00b4d8" />
+      <stop offset="100%" stop-color="#0077b6" />
+    </linearGradient>
+    <style>
+      .bg { fill: url(#jBgGrad); }
+      .border { stroke: rgba(255, 255, 255, 0.22); stroke-width: 2.2; fill: none; }
+      .letter-j { fill: none; stroke: #ffffff; stroke-width: 8.5; stroke-linecap: round; stroke-linejoin: round; }
+      .dot { fill: url(#dotGrad); }
+      @media (prefers-color-scheme: dark) {
+        .bg { fill: #111113; }
+        .border { stroke: rgba(255, 255, 255, 0.3); }
+      }
+    </style>
+  </defs>
+  <rect class="bg" x="2" y="2" width="60" height="60" rx="16" />
+  <rect class="border" x="2" y="2" width="60" height="60" rx="16" />
+  <!-- Letter J Hook -->
+  <path class="letter-j" d="M38 16 v23 a11 11 0 0 1 -22 0" />
+  <!-- EaseUI Sky Blue Terminal Dot -->
+  <circle class="dot" cx="38" cy="16" r="4.5" />
+</svg>

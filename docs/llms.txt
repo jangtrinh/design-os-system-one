@@ -10,7 +10,7 @@ Sub-10ms Calibrated Judgments for Autonomous Agents with Zero Cloud Waste.
 - [Case Study & Battle Journal](https://jangtrinh.github.io/design-os-system-one/case-study.html): In-depth empirical benchmark report, battle journal, and speculative commit engine architecture.
 - [Architectural Patterns](https://jangtrinh.github.io/design-os-system-one/08-architectural-patterns.html): Architectural patterns for agents, swarms, and browser loops.
 - [Core Primitives](https://jangtrinh.github.io/design-os-system-one/02-core-primitives.html): TypeSafe System 1 decision contracts (Choice, Score, Noul).
-- [REST API Reference](https://jangtrinh.github.io/design-os-system-one/05-rest-api-reference.html): API reference for System One evaluation and Gateway routing.
+- [Full Technical Specification (LLMs Full)](https://jangtrinh.github.io/design-os-system-one/llms-full.txt): Complete architecture specification, empirical benchmark logs, and execution contracts for AI search crawlers.
 - [Repository](https://github.com/jangtrinh/design-os-system-one): GitHub source code, releases, and tests.
 
 ## Key Architecture & Invariants
