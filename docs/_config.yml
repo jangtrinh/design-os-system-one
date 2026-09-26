@@ -14,12 +14,15 @@ wordmark: JANGTRINH
 wordmark_url: https://github.com/jangtrinh
 eyebrow: AGENTIC SYSTEM 1 · DUAL-BRAIN ARCHITECTURE          # short product family label, e.g. design:os
 logo: /images/cover.png          # a real capture under docs/images/
-nav:                        # one entry per Markdown page under docs/, in reading order
+nav:                        # primary navigation tabs (3-4 items max)
   - { title: "Case Study", url: "/case-study.html" }
   - { title: "Primitives", url: "/02-core-primitives.html" }
   - { title: "Architecture", url: "/08-architectural-patterns.html" }
-  - { title: "API Reference", url: "/05-rest-api-reference.html" }
-  - { title: "Recipes", url: "/09-cookbooks-and-recipes.html" }
+nav_more:                   # items nested inside More dropdown
+  - { title: "API Reference", url: "/05-rest-api-reference.html", meta: "rest" }
+  - { title: "Cookbooks & Recipes", url: "/09-cookbooks-and-recipes.html", meta: "code" }
+  - { title: "All Documentation", url: "/00-index.html", meta: "10 guides" }
+  - { title: "Art Direction Spec", url: "/ART-DIRECTION.md", meta: "3D spec" }
 footer:
   - { title: "GitHub", url: "https://github.com/jangtrinh/design-os-system-one" }
   - { title: "Case Study", url: "https://jangtrinh.github.io/design-os-system-one/case-study.html" }

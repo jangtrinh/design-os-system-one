@@ -46,6 +46,19 @@ strong{font-weight:var(--fw-semibold)}
 .ds-tab::after{content:"";position:absolute;inset:calc((var(--tap-min) - var(--ctl-32)) / -2)}
 .ds-tab[aria-current="page"]{background:var(--c-gray-300);color:var(--c-gray-1200)}
 
+/* Nav More Dropdown */
+.ds-dropdown{position:relative;display:inline-block}
+.ds-dropdown summary{list-style:none;cursor:pointer;user-select:none}
+.ds-dropdown summary::-webkit-details-marker{display:none}
+.ds-dropdown summary .ph-caret{transition:transform var(--dur-fast) var(--ease-out)}
+.ds-dropdown[open] summary .ph-caret{transform:rotate(180deg)}
+.ds-dropdown-menu{position:absolute;top:calc(100% + var(--s-2));right:0;min-width:220px;background:var(--c-canvas);border:1px solid var(--c-preview-border);border-radius:var(--r-4);box-shadow:0 10px 25px -5px rgba(0,0,0,0.1),0 8px 10px -6px rgba(0,0,0,0.06);padding:var(--s-2);z-index:100;display:flex;flex-direction:column;gap:2px}
+.ds-dropdown-item{display:flex;align-items:center;justify-content:space-between;padding:var(--s-3) var(--s-4);border-radius:var(--r-3);font-size:var(--t-14);color:var(--c-gray-1100);text-decoration:none !important;transition:background-color var(--dur-fast) var(--ease-out),color var(--dur-fast) var(--ease-out)}
+.ds-dropdown-item:hover{background:var(--c-gray-200);color:var(--c-gray-1200)}
+.ds-dropdown-item small{font-family:var(--stack-mono);font-size:11px;color:var(--c-gray-900)}
+.ds-dropdown-divider{height:1px;background:var(--c-gray-300);margin:var(--s-2) 0}
+
+
 .ds-shell-main{flex:1;padding-block:var(--s-24)}
 /* Pacing is authored per section, not one gap everywhere: a step that continues the
    previous thought sits close; a new chapter gets the full 128px. */
