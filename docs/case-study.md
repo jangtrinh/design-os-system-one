@@ -103,7 +103,7 @@ All metrics below were measured on physical hardware (no synthetic estimates), r
 ```mermaid
 xychart-beta
     title "P50 Latency Comparison Across Architectures (Milliseconds - Lower is Better)"
-    x-axis ["Laya-MLX (Local)", "Laya-MPS (Local)", "Cascade Router (th=0.3)", "TypeSafe JEV (Cloud)", "LLM 70B Autoregressive"]
+    x-axis ["Laya-MLX", "Laya-MPS", "Cascade Router", "TypeSafe JEV", "LLM 70B"]
     y-axis "P50 Latency (ms)" 0 --> 3500
     bar [6.5, 26.4, 243.2, 796.8, 3200.0]
 ```

@@ -1050,6 +1050,127 @@ bash &lt;(curl -fsSL https://raw.githubusercontent.com/jangtrinh/jang-skills/mai
   updateCalc(1000000);
 })();
 </script>
+<script>
+/* ---------------------------------------------------------------- Mermaid Diagram Auto-Loader & EaseUI Theme */
+(async function initMermaidDiagrams() {
+  var blocks = document.querySelectorAll('pre code.language-mermaid, .language-mermaid pre code, .language-mermaid code, pre.mermaid, div.mermaid');
+  if (!blocks.length) return;
+
+  var elementsToRender = [];
+  blocks.forEach(function (el) {
+    if (el.closest('.mermaid-wrapper')) return;
+    var container = el;
+    if (el.tagName === 'CODE' && el.parentElement && el.parentElement.tagName === 'PRE') {
+      container = el.parentElement;
+      if (container.parentElement && container.parentElement.classList.contains('language-mermaid')) {
+        container = container.parentElement;
+      }
+    } else if (el.classList.contains('language-mermaid')) {
+      container = el;
+    }
+
+    var rawCode = (el.tagName === 'CODE' ? el.textContent : (el.querySelector('code') || el).textContent).trim();
+    if (!rawCode) return;
+
+    var wrapper = document.createElement('div');
+    wrapper.className = 'mermaid-wrapper';
+    var pre = document.createElement('pre');
+    pre.className = 'mermaid';
+    pre.textContent = rawCode;
+    wrapper.appendChild(pre);
+    container.parentNode.replaceChild(wrapper, container);
+    elementsToRender.push(pre);
+  });
+
+  if (!elementsToRender.length) return;
+
+  function loadScript(src) {
+    return new Promise(function(resolve, reject) {
+      if (window.mermaid) return resolve();
+      var s = document.createElement('script');
+      s.src = src;
+      s.onload = resolve;
+      s.onerror = reject;
+      document.head.appendChild(s);
+    });
+  }
+
+  try {
+    await loadScript('https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js');
+    mermaid.initialize({
+      startOnLoad: false,
+      securityLevel: 'loose',
+      fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+      theme: 'base',
+      themeVariables: {
+        fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+        fontSize: '13px',
+        darkMode: false,
+        background: '#ffffff',
+        mainBkg: '#fcfcfc',
+        primaryColor: '#fcfcfc',
+        primaryTextColor: '#202020',
+        primaryBorderColor: '#d9d9d9',
+        lineColor: '#7b7b7b',
+        secondaryColor: '#f6f6f6',
+        tertiaryColor: '#ffffff',
+        nodeBorder: '#d9d9d9',
+        clusterBkg: '#f6f6f6',
+        clusterBorder: '#e0e0e0',
+        titleColor: '#202020',
+        edgeLabelBackground: '#ffffff',
+        arrowheadColor: '#0084cc',
+
+        // Sequence
+        actorBkg: '#fcfcfc',
+        actorBorder: '#d9d9d9',
+        actorTextColor: '#202020',
+        actorLineColor: '#b0b0b0',
+        signalColor: '#202020',
+        signalTextColor: '#202020',
+        labelBoxBkgColor: '#f6f6f6',
+        labelBoxBorderColor: '#e0e0e0',
+        labelTextColor: '#202020',
+        loopTextColor: '#7b7b7b',
+        noteBkgColor: '#fdfbf7',
+        noteBorderColor: '#e0e0e0',
+        noteTextColor: '#202020',
+        activationBorderColor: '#0084cc',
+        activationBkgColor: '#f0f9ff',
+        sequenceNumberColor: '#ffffff',
+
+        // State
+        labelColor: '#202020',
+        altBackground: '#f6f6f6',
+        compositeBackground: '#fcfcfc',
+        compositeBorder: '#d9d9d9',
+
+        // Flowchart
+        nodeTextColor: '#202020',
+
+        // XY Chart
+        xyChart: {
+          plotColorPalette: '#0084cc',
+          backgroundColor: '#ffffff',
+          titleColor: '#202020',
+          xAxisLabelColor: '#202020',
+          xAxisTitleColor: '#7b7b7b',
+          xAxisLineColor: '#d9d9d9',
+          yAxisLabelColor: '#202020',
+          yAxisTitleColor: '#7b7b7b',
+          yAxisLineColor: '#d9d9d9'
+        }
+      }
+    });
+
+    await mermaid.run({
+      querySelector: '.mermaid-wrapper .mermaid'
+    });
+  } catch (err) {
+    console.error('Failed to initialize or render Mermaid diagrams:', err);
+  }
+})();
+</script>
 <script data-name="BMC-Widget" data-cfasync="false" src="https://cdnjs.buymeacoffee.com/1.0.0/widget.prod.min.js" data-id="jangtrinh" data-description="Support me on Buy me a coffee!" data-message="" data-color="#FF813F" data-position="Right" data-x_margin="18" data-y_margin="18"></script>
 </body>
 </html>
