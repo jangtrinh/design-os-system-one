@@ -1,0 +1,30 @@
+# TypeSafe JEV & Dual-Brain System 1
+
+> TypeSafe JEV & Dual-Brain System 1: sub-10ms on-device decisions with Laya-MLX, 5-stage speculative commit engine, and 95% LLM cost reduction for autonomous agents.
+
+Sub-10ms Calibrated Judgments for Autonomous Agents with Zero Cloud Waste.
+
+## Documentation & Case Study
+
+- [Landing Overview](https://jangtrinh.github.io/jev/): Main project overview, benchmarks, and interactive architecture.
+- [Case Study & Battle Journal](https://jangtrinh.github.io/jev/case-study.html): In-depth 290-line empirical benchmark report, battle journal, and speculative commit engine architecture.
+- [Architectural Patterns](https://jangtrinh.github.io/jev/08-architectural-patterns.html): Architectural patterns for agents, swarms, and browser loops.
+- [Core Primitives](https://jangtrinh.github.io/jev/02-core-primitives.html): TypeSafe System 1 decision contracts (Choice, Score, Noul).
+- [REST API Reference](https://jangtrinh.github.io/jev/05-rest-api-reference.html): API reference for System One evaluation and Gateway routing.
+- [Repository](https://github.com/jangtrinh/jev): GitHub source code, releases, and tests.
+
+## Key Architecture & Invariants
+
+- **Dual-Brain System 1 Cascade**:
+  - Tier 1: Local Laya-MLX on Apple Silicon Unified Memory (6.53ms P50, $0.00 cost, 100% air-gapped).
+  - Cascade sweet spot (tau = 0.30): 70% of traffic resolved on-device in <10ms; 30% ambiguous cases escalate to TypeSafe JEV Cloud API (3.41x overall speedup).
+- **5-Stage Speculative Commit Engine**:
+  - `OBSERVED -> EVALUATED -> PREPARED -> DISPATCHING -> VERIFYING -> CONFIRMED` (or `UNKNOWN -> RECONCILING`).
+  - Speculate on judgments only; high-risk browser mutations require postcondition verifiers and transaction journaling.
+  - Dispatch timeouts transition to `UNKNOWN` / `UNCERTAIN` and trigger read-only DOM reconciliation, eliminating duplicate mutations.
+- **Revocation of Autonomous 'DONE'**:
+  - Models cannot unilaterally close tasks; task completion requires 100% acceptance test proof (`VERIFY_AND_STOP`).
+- **Cryptographic exactCache**:
+  - All Gateway Router and Skill Pruner cache keys use SHA-256 over canonical JSON to prevent cross-prompt collision exploits.
+- **Air-Gapped Privacy (`localOnly: true`)**:
+  - Strictly forbids WAN cloud calls, guaranteeing zero telemetry and zero external data leaks.
