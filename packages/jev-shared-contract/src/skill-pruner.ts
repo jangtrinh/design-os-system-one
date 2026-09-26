@@ -5,6 +5,7 @@
  * for explicitly invoked/mandatory skills, and schema token reduction >80%.
  */
 
+import { createHash } from "node:crypto";
 import { TwoTierPersistentCache, TwoTierCacheOptions } from "./cache-storage.js";
 import { limitConcurrency } from "./concurrency.js";
 
@@ -69,19 +70,26 @@ export class JevSkillPruner {
   }
 
   /**
-   * Generates a stable hash key for caching.
+   * Generates a stable cryptographic hash key incorporating prompt, policy, and full skill manifests.
    */
   private makeCacheKey(input: SkillPrunerInput): string {
     const epoch = input.intentEpoch ?? 0;
-    const promptSummary = input.prompt.toLowerCase().trim().slice(0, 64);
-    const manifestDigest = input.availableSkills.map((s) => s.name).sort().join(",");
-    let hash = 0;
-    const key = `${epoch}:${promptSummary}:${manifestDigest}`;
-    for (let i = 0; i < key.length; i++) {
-      hash = (hash << 5) - hash + key.charCodeAt(i);
-      hash |= 0;
+    const policyDigest = JSON.stringify(input.policy || {});
+    const manifestDigest = input.availableSkills
+      .map((s) => `${s.name}:${s.mandatory ? 1 : 0}:${s.description}`)
+      .sort()
+      .join("|");
+    const raw = `${epoch}:${input.prompt}:${policyDigest}:${manifestDigest}`;
+    try {
+      return createHash("sha256").update(raw).digest("hex");
+    } catch {
+      let hash = 0;
+      for (let i = 0; i < raw.length; i++) {
+        hash = (hash << 5) - hash + raw.charCodeAt(i);
+        hash |= 0;
+      }
+      return Math.abs(hash).toString(36);
     }
-    return Math.abs(hash).toString(36);
   }
 
   /**

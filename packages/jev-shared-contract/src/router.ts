@@ -5,6 +5,7 @@
  * Provides sub-50ms model tier routing, semantic context block pruning, and exact caching.
  */
 
+import { createHash } from "node:crypto";
 import {
   Choice,
   GatewayDecisionInput,
@@ -71,19 +72,19 @@ export class JevGatewayRouter {
   }
 
   /**
-   * Universal string hash (supports Node.js Buffer and browser/worker environments)
+   * Cryptographic SHA-256 string hash to prevent cache collisions
    */
   hashString(str: string): string {
-    const buf = (globalThis as any).Buffer;
-    if (buf && typeof buf.from === "function") {
-      return buf.from(str).toString("base64").slice(0, 16);
+    try {
+      return createHash("sha256").update(str).digest("hex");
+    } catch {
+      let hash = 0;
+      for (let i = 0; i < str.length; i++) {
+        hash = (hash << 5) - hash + str.charCodeAt(i);
+        hash |= 0;
+      }
+      return Math.abs(hash).toString(36);
     }
-    let hash = 0;
-    for (let i = 0; i < str.length; i++) {
-      hash = (hash << 5) - hash + str.charCodeAt(i);
-      hash |= 0;
-    }
-    return Math.abs(hash).toString(36);
   }
 
   /**
@@ -103,10 +104,13 @@ export class JevGatewayRouter {
 
     // 1. Exact Cache Check (Zero cost, instant return)
     if (this.exactCache.has(promptHash) || this.exactCache.has(input.request)) {
+      const cachedRoute: GatewayRoute = input.eligibleRoutes?.includes("small")
+        ? "small"
+        : input.eligibleRoutes?.[0] || "small";
       return {
         planId,
         cacheHit: true,
-        selectedRoute: "small",
+        selectedRoute: cachedRoute,
         recommendedModel: "exact-cache",
         originalTokenEstimate: 0,
         prunedTokenEstimate: 0,
@@ -146,8 +150,14 @@ export class JevGatewayRouter {
       ? Math.round((tokensSaved / originalTokens) * 100)
       : 0;
 
-    // 4. Model Tier Selection & Budget Calculation
-    const selectedRoute = triageResult.route.choice;
+    // 4. Model Tier Selection & Strict Eligible Routes Enforcement
+    let selectedRoute = triageResult.route.choice;
+    if (input.eligibleRoutes && input.eligibleRoutes.length > 0) {
+      if (!input.eligibleRoutes.includes(selectedRoute)) {
+        selectedRoute = input.eligibleRoutes[0];
+      }
+    }
+
     const recommendedModel = this.routeModelMap[selectedRoute] || "gpt-4o-mini";
     const pricePer1k = this.priceMapPer1k[selectedRoute] || 0.001;
     const reservedBudgetUsd = (prunedTokens / 1000) * pricePer1k;

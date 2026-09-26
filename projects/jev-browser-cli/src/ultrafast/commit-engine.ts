@@ -1,11 +1,12 @@
 /**
  * 5-Stage Speculative Commit Engine for Browser & Agent Side-Effects
+ * Hardened with Adversarial Red Team Golden Synthesis:
  *
- * Implements the protocol recommended by Codex Web PRO:
- * OBSERVED → EVALUATED → PREPARED → DISPATCHING → CONFIRMED
- *                           ↘ ABORTED          ↘ UNCERTAIN
- *                                                ↓
- *                                           RECONCILING
+ * PREPARED ──► DISPATCHING ──► VERIFYING ──► CONFIRMED
+ *     │                                  │
+ *     ├──► BLOCKED (missing verifier)    └──► UNKNOWN ──► RECONCILING
+ *     │                                  │
+ *     └──► UNVERIFIED (low risk)         └──► UNCERTAIN
  */
 
 import * as fs from 'fs';
@@ -20,6 +21,9 @@ export type CommitState =
   | 'DISPATCHING'
   | 'CONFIRMED'
   | 'ABORTED'
+  | 'BLOCKED'
+  | 'UNVERIFIED'
+  | 'UNKNOWN'
   | 'UNCERTAIN'
   | 'RECONCILING';
 
@@ -195,7 +199,7 @@ export class CommitEngine {
   }
 
   /**
-   * Executes an action through the formal 5-stage pipeline.
+   * Executes an action through the hardened formal pipeline.
    */
   async execute<T>(params: {
     tx: CommitTransaction<T>;
@@ -206,14 +210,43 @@ export class CommitEngine {
   }): Promise<CommitTransaction<T>> {
     const { tx, judgeFn, dispatchFn, verifyPostconditionFn, reconcileFn } = params;
 
+    // Guard: Expiration check before any evaluation
+    if (tx.binding.expiresAtMs && Date.now() > tx.binding.expiresAtMs) {
+      tx.state = 'ABORTED';
+      tx.reason = `Transaction expired: now=${Date.now()}, expiresAt=${tx.binding.expiresAtMs}`;
+      return tx;
+    }
+
     // Stage 1: OBSERVED -> Stage 2: EVALUATED
+    let judgment: Result<any>;
     try {
-      const judgment = await judgeFn();
-      if (judgment.status === 'abstain') {
+      judgment = await judgeFn();
+      const status = (judgment as any).status;
+      if (status === 'abstain') {
         tx.state = 'ABORTED';
-        tx.reason = `Judge abstained: ${judgment.reason}`;
+        tx.reason = `Judge abstained: ${(judgment as any).reason}`;
         return tx;
       }
+      if (status !== 'ok') {
+        tx.state = 'ABORTED';
+        tx.reason = `Judge returned non-ok status: ${status}`;
+        return tx;
+      }
+
+      // Strict binding and epoch validation
+      if (judgment.binding) {
+        if (judgment.binding.intentEpoch !== tx.binding.intentEpoch) {
+          tx.state = 'ABORTED';
+          tx.reason = `Judgment epoch mismatch: expected=${tx.binding.intentEpoch}, got=${judgment.binding.intentEpoch}`;
+          return tx;
+        }
+        if (judgment.binding.stateHash && tx.binding.stateHash && judgment.binding.stateHash !== tx.binding.stateHash) {
+          tx.state = 'ABORTED';
+          tx.reason = `Judgment stateHash mismatch: expected=${tx.binding.stateHash}, got=${judgment.binding.stateHash}`;
+          return tx;
+        }
+      }
+
       tx.state = 'EVALUATED';
     } catch (err: any) {
       tx.state = 'ABORTED';
@@ -230,6 +263,14 @@ export class CommitEngine {
     }
     tx.fencingToken = lease;
 
+    // Re-check expiration before acquiring lock
+    if (tx.binding.expiresAtMs && Date.now() > tx.binding.expiresAtMs) {
+      this.releaseLease(lease);
+      tx.state = 'ABORTED';
+      tx.reason = `Transaction expired before lock acquisition: now=${Date.now()}, expiresAt=${tx.binding.expiresAtMs}`;
+      return tx;
+    }
+
     // Strict Epoch & State Check
     if (tx.binding.intentEpoch !== this.currentEpoch) {
       this.releaseLease(lease);
@@ -242,6 +283,21 @@ export class CommitEngine {
       this.releaseLease(lease);
       tx.state = 'ABORTED';
       tx.reason = `DOM mutation detected prior to commit: hash changed`;
+      return tx;
+    }
+
+    // Red Team Golden Synthesis: Detect missing verifier/reconciler BEFORE dispatch!
+    const isHighRisk =
+      tx.effectType === 'external' ||
+      tx.actionId.includes('submit') ||
+      tx.actionId.includes('click') ||
+      tx.actionId.includes('delete') ||
+      tx.actionId.includes('order');
+
+    if (isHighRisk && !verifyPostconditionFn && !reconcileFn) {
+      this.releaseLease(lease);
+      tx.state = 'BLOCKED';
+      tx.reason = `Security rule: High-risk action (${tx.actionId}, effectType=${tx.effectType}) requires a registered postcondition verifier or reconciler before dispatch.`;
       return tx;
     }
 
@@ -265,9 +321,9 @@ export class CommitEngine {
       this.releaseLease(lease);
 
       if (err.message === 'DISPATCH_TIMEOUT') {
-        // Crucial Architectural Rule: Timeout after dispatch is UNCERTAIN, NOT failed!
+        // Red Team Rule: Timeout after dispatch is UNCERTAIN, never blindly FAILED
         tx.state = 'UNCERTAIN';
-        tx.reason = 'Transport timeout after dispatch: effect may have taken place on page/server';
+        tx.reason = 'Transport timeout after dispatch: state uncertain, triggering reconciliation';
         this.updateJournal(tx);
 
         if (reconcileFn) {
@@ -280,8 +336,13 @@ export class CommitEngine {
               tx.completedAtMs = Date.now();
               this.updateJournal(tx);
               return tx;
+            } else {
+              tx.state = 'UNKNOWN';
+              tx.reason = 'Reconciliation did not confirm postconditions: manual inspection required';
+              return tx;
             }
           } catch (reconcileErr: any) {
+            tx.state = 'UNKNOWN';
             tx.reason += ` (Reconciliation error: ${reconcileErr.message})`;
           }
         }
@@ -295,27 +356,33 @@ export class CommitEngine {
       return tx;
     }
 
-    // Stage 5: CONFIRMED - Verify postconditions
+    // Stage 5: Postcondition Observation & Verification
     try {
       if (verifyPostconditionFn) {
         const verified = await verifyPostconditionFn(dispatchResult);
         if (!verified) {
           this.releaseLease(lease);
           tx.state = 'UNCERTAIN';
-          tx.reason = 'Postcondition verification failed: unexpected DOM state after action';
+          tx.reason = 'Postcondition verification failed: expected changes not observed in DOM';
           this.updateJournal(tx);
           return tx;
         }
+
+        this.releaseLease(lease);
+        tx.state = 'CONFIRMED';
+        tx.completedAtMs = Date.now();
+        return tx;
       }
 
+      // Low-risk action executed without verifier
       this.releaseLease(lease);
-      tx.state = 'CONFIRMED';
+      tx.state = 'UNVERIFIED';
       tx.completedAtMs = Date.now();
       this.updateJournal(tx);
       return tx;
     } catch (err: any) {
       this.releaseLease(lease);
-      tx.state = 'UNCERTAIN';
+      tx.state = 'UNKNOWN';
       tx.reason = `Postcondition check threw error: ${err.message}`;
       this.updateJournal(tx);
       return tx;

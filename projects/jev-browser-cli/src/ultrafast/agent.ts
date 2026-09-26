@@ -125,6 +125,16 @@ export class JevUltrafastAgent {
         state.status = "ready";
         throw new StalePageError("Page changed since decision. Predict again.");
       }
+
+      if (selected === "DONE") {
+        // Red Team Golden Synthesis: Model proposes intent, controller validates acceptance
+        const hasMutations = state.history.some((h) => h.kind === "click" || h.kind === "fill");
+        if (!hasMutations && state.history.length === 0) {
+          state.status = "blocked";
+          throw new Error(`Model proposed DONE without executing any actions towards goal: "${state.goal}". Controller rejection.`);
+        }
+      }
+
       state.status = selected === "DONE" ? "done" : "blocked";
       state.plan_index = selected === "DONE" ? 1 : 0;
       state.elapsed_ms = Date.now() - (state.started_at || Date.now());
@@ -164,7 +174,8 @@ export class JevUltrafastAgent {
     }
 
     const executionStarted = Date.now();
-    const effectType = action.kind === "fill" ? "external" : "local";
+    const isExternal = action.kind === "click" || action.kind === "fill";
+    const effectType: "read" | "local" | "external" = isExternal ? "external" : "local";
     const tx = this.commitEngine.beginObservation(selected, effectType);
 
     const commitRes = await this.commitEngine.execute({
@@ -180,11 +191,26 @@ export class JevUltrafastAgent {
           await this.driver.act(this.tabWsUrl, action, page, text);
         }
         return true;
+      },
+      verifyPostconditionFn: async () => {
+        if (this.dryRun) return true;
+        const fresh = await this.driver.observe(this.tabWsUrl, { screenshot: false });
+        return fresh.fingerprint !== page.fingerprint || action.kind === "wait" || action.kind === "scroll";
+      },
+      reconcileFn: async () => {
+        if (this.dryRun) return true;
+        const fresh = await this.driver.observe(this.tabWsUrl, { screenshot: false });
+        return fresh.fingerprint !== page.fingerprint;
       }
     });
 
-    if (commitRes.state === "ABORTED") {
-      throw new StalePageError(`Commit aborted: ${commitRes.reason}`);
+    if (commitRes.state === "ABORTED" || commitRes.state === "BLOCKED") {
+      throw new StalePageError(`Commit rejected [${commitRes.state}]: ${commitRes.reason}`);
+    }
+
+    if (commitRes.state === "UNKNOWN" || commitRes.state === "UNCERTAIN") {
+      state.status = "blocked";
+      throw new Error(`Commit state uncertain: ${commitRes.reason}. Requires read-only reconciliation before subsequent mutations.`);
     }
 
     this.pendingText = null;

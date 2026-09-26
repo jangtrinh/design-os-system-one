@@ -131,7 +131,17 @@ export class CdpSessionPool {
       ws.onmessage = (event) => {
         this.resetIdleTimer(session);
         try {
-          const data: CdpResponse = JSON.parse(String(event.data));
+          let raw: string;
+          if (typeof event.data === "string") {
+            raw = event.data;
+          } else if (Buffer.isBuffer(event.data)) {
+            raw = (event.data as Buffer).toString("utf-8");
+          } else if (event.data instanceof ArrayBuffer) {
+            raw = Buffer.from(event.data).toString("utf-8");
+          } else {
+            raw = String(event.data);
+          }
+          const data: CdpResponse = JSON.parse(raw);
           const req = session.inFlight.get(data.id);
           if (req) {
             clearTimeout(req.timer);

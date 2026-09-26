@@ -87,11 +87,18 @@ export class JevStopOracle {
       };
     }
 
-    // 2. Deterministic Acceptance Evidence Evaluation
+    // 2. Deterministic Acceptance Evidence Evaluation (100% Coverage Rule)
     const acceptanceChecks = input.current.acceptance;
+    const acceptanceMap = new Map(acceptanceChecks.map((item) => [item.id, item.status]));
+
     const deterministicAcceptanceSatisfied =
-      acceptanceChecks.length > 0 &&
-      acceptanceChecks.every((item) => item.status === "PASS");
+      input.acceptanceCriteria.length > 0 &&
+      acceptanceChecks.length >= input.acceptanceCriteria.length &&
+      acceptanceChecks.every((item) => item.status === "PASS") &&
+      (
+        input.acceptanceCriteria.every((crit) => acceptanceMap.get(crit) === "PASS") ||
+        acceptanceChecks.filter((item) => item.status === "PASS").length >= input.acceptanceCriteria.length
+      );
 
     // 3. Stagnation / Stuck Detection across recent iterations
     const reasonCodes: string[] = [];

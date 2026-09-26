@@ -199,6 +199,12 @@ export function validateChoiceDistribution<K extends string>(
   if (choice.probabilities && typeof choice.probabilities === "object") {
     let sum = 0;
     for (const [key, prob] of Object.entries(choice.probabilities)) {
+      if (!allowedCandidates.includes(key as K)) {
+        return {
+          valid: false,
+          error: `Probability key '${key}' is not in allowed candidates: [${allowedCandidates.join(", ")}]`,
+        };
+      }
       if (typeof prob !== "number" || isNaN(prob) || (prob as number) < 0 || (prob as number) > 1.01) {
         return { valid: false, error: `Probability for key ${key} is invalid: ${prob}` };
       }
@@ -218,6 +224,11 @@ export function validateResult<T>(
 ): { valid: boolean; error?: string } {
   if (!result || !result.binding) {
     return { valid: false, error: "Missing decision result or binding envelope" };
+  }
+
+  const validStatuses = ["ok", "abstain", "timeout", "invalid", "stale"];
+  if (!validStatuses.includes((result as any).status)) {
+    return { valid: false, error: `Invalid result status: ${(result as any).status}` };
   }
 
   if (Date.now() > result.binding.expiresAtMs) {
