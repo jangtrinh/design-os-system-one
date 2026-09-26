@@ -4,7 +4,7 @@
 # jekyll-seo-tag emits <title>, <meta name="description">, Open Graph and JSON-LD;
 # jekyll-sitemap emits sitemap.xml for Google Search Console.
 title: jev
-description: TypeSafe JEV and Dual-Brain System 1: sub-10ms on-device decisions, 5-stage speculative commit engine, and 95% LLM cost reduction for autonomous agents.
+description: "TypeSafe JEV and Dual-Brain System 1: sub-10ms on-device decisions, 5-stage speculative commit engine, and 95% LLM cost reduction for autonomous agents."
 url: https://jangtrinh.github.io
 baseurl: /jev
 lang: en
@@ -15,15 +15,15 @@ wordmark_url: https://github.com/jangtrinh
 eyebrow: AGENTIC SYSTEM 1 · DUAL-BRAIN ARCHITECTURE          # short product family label, e.g. design:os
 logo: /images/cover.png          # a real capture under docs/images/
 nav:                        # one entry per Markdown page under docs/, in reading order
-  - { title: Case Study, url: /case-study.html }
-  - { title: Primitives, url: /02-core-primitives.html }
-  - { title: Architecture, url: /08-architectural-patterns.html }
-  - { title: API Reference, url: /05-rest-api-reference.html }
-  - { title: Recipes, url: /09-cookbooks-and-recipes.html }
+  - { title: "Case Study", url: "/case-study.html" }
+  - { title: "Primitives", url: "/02-core-primitives.html" }
+  - { title: "Architecture", url: "/08-architectural-patterns.html" }
+  - { title: "API Reference", url: "/05-rest-api-reference.html" }
+  - { title: "Recipes", url: "/09-cookbooks-and-recipes.html" }
 footer:
-  - { title: GitHub, url: https://github.com/jangtrinh/jev }
-  - { title: Case Study, url: https://jangtrinh.github.io/jev/case-study.html }
-  - { title: MIT, url: https://github.com/jangtrinh/jev/blob/main/LICENSE }
+  - { title: "GitHub", url: "https://github.com/jangtrinh/jev" }
+  - { title: "Case Study", url: "https://jangtrinh.github.io/jev/case-study.html" }
+  - { title: "MIT", url: "https://github.com/jangtrinh/jev/blob/main/LICENSE" }
 plugins:
   - jekyll-seo-tag
   - jekyll-sitemap
