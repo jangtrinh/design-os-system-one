@@ -29,6 +29,9 @@ Through rigorous benchmarking, head-to-head empirical testing, and red-team audi
 - **5-Stage Speculative Commit Engine**: Eliminates blind mutation disasters using Intent Epochs, Fencing Lease Tokens, Pre-Dispatch Verifier Gates, and read-only reconciliation (`UNKNOWN -> RECONCILING`).
 - **Revocation of Autonomous `DONE`**: Mandates that task completion be certified solely by deterministic acceptance test suites (`VERIFY_AND_STOP`).
 
+![Master System 1 Architecture](images/system-one-chassis.png)
+*Figure 1: Master System 1 Decision Architecture — 4-tier exploded isometric hardware visualization featuring on-device Apple Silicon unified memory, non-autoregressive tensor core, confidence cascade prism, and hardened speculative commit engine.*
+
 ---
 
 ## PART 1: THE ENGINEERING JOURNAL — BATTLE LOGS & UNCENSORED REALITIES
@@ -180,6 +183,9 @@ Conducted under the standard `es:session-retro` discipline: accounting for sessi
 
 ### 4.1 The 5-Stage Speculative Commit Engine State Machine
 
+![5-Stage Speculative Commit Engine](images/speculative-commit-engine.png)
+*Figure 2: The 5-Stage Hardened Speculative Commit Engine — linear stepped tactile borosilicate wafers (Observed → Evaluated → Prepared → Dispatching → Verifying & Confirmed) with lease fencing token latches and parallel read-only reconciliation canal.*
+
 ```mermaid
 stateDiagram-v2
     [*] --> OBSERVED: Read DOM Snapshot / State
@@ -216,6 +222,9 @@ stateDiagram-v2
 
 ### 4.2 The Dual-Brain Cascade Router Flow ($\tau = 0.30$)
 
+![Dual-Brain Cascade Router](images/dual-brain-cascade.png)
+*Figure 3: Dual-Brain Cascade Routing at $\tau = 0.30$ — luminous refractive crystal prism directing 70% of high-confidence requests to local Apple Silicon and escalating 30% of ambiguous boundaries to cloud triage.*
+
 ```mermaid
 flowchart TD
     Req["Incoming Request (User Prompt / Task Context)"] --> PII["Laya Hook: PII Sanitization & Injection Guard (<10ms)"]
@@ -235,6 +244,9 @@ flowchart TD
 ---
 
 ### 4.3 Sub-50ms Fast Generative UI Architecture
+
+![Sub-50ms Fast Generative UI Engine](images/fast-generative-ui.png)
+*Figure 4: Sub-50ms Real-Time Generative UI Engine — on-device intent classifier, pre-compiled Zod component catalog prism, and real-time morphing canvas layout.*
 
 ```mermaid
 sequenceDiagram

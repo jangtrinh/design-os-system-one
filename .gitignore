@@ -16,6 +16,7 @@ build/
 *.png
 *.jpg
 *.jpeg
+!docs/images/**
 *daemon-state.json
 *growth-state.json
 *audit-ledger.json
