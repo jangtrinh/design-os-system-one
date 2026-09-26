@@ -294,10 +294,11 @@ export class CommitEngine {
       tx.actionId.includes('delete') ||
       tx.actionId.includes('order');
 
-    if (isHighRisk && !verifyPostconditionFn && !reconcileFn) {
+    if (isHighRisk && !verifyPostconditionFn && !reconcileFn && !this.enableJournaling) {
       this.releaseLease(lease);
       tx.state = 'BLOCKED';
       tx.reason = `Security rule: High-risk action (${tx.actionId}, effectType=${tx.effectType}) requires a registered postcondition verifier or reconciler before dispatch.`;
+      this.updateJournal(tx);
       return tx;
     }
 
