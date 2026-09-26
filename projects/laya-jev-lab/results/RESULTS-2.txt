@@ -1,0 +1,102 @@
+########## 07-adblock
+========================================================================================
+演示 6：网页广告识别（真实页面：smashingmagazine.com，40 个可见块）
+========================================================================================
+  判定    广告分     置信  内容                                                  
+  广告   2.89  0.780  Pierre Burgy wrote
+Why Your Website Should Never Sto
+  广告   2.39  0.280  Every website peaks on launch day and slowly drifts 
+  推广   1.70  0.288  Alex Williams / sep 11, 2026
+Building A UX ROI Case 
+  推广   1.67  0.226  Alexey Kopytin wrote
+Building Tactile UX: Honoring I
+  推广   1.64  0.320  When tasked with building a highly interactive, tact
+  推广   1.63  0.186  CSS Generators & Tools
+
+Useful CSS tools for animati
+ ...              
+  内容   1.12  0.290  august 31, 2026 in Wallpapers
+  内容   1.10  0.332  Victor Ayomipo wrote
+  内容   0.83  0.190  Jump to all articles ↬
+总计 38 个元素，305 ms（平均 8.0 ms/元素）
+判定分布：广告 2 个 · 推广 32 个 · 内容 4 个
+
+########## 07b-tuning
+====================================================================================
+诊断：档位怎么切，区分度最大？
+====================================================================================
+
+V1 四档(原)：['正常内容', '编辑推荐或相关文章', '明显的商业推广/订阅引导', '纯商业广告']
+    期望     得分  内容
+     0   1.03  ✗ Despite broad browser support, container queries r
+     0   1.57  ✗ The Death Of The Button: Why The Best Interface Is
+     2   1.21  ✓ CSS Generators & Tools — Useful CSS tools for anim
+     2   1.13  ✓ Email Newsletter — Useful front-end & UX tips, del
+     3   2.58  ✓ Sponsored: Get 50% off our premium courses this we
+     3   2.25  ✓ Advertisement — Buy this product now at a special 
+
+V2 三档：['这是正文内容', '这是推荐/导流', '这是广告或订阅推销']
+    期望     得分  内容
+     0   1.33  ✗ Despite broad browser support, container queries r
+     0   1.29  ✗ The Death Of The Button: Why The Best Interface Is
+     2   1.33  ✓ CSS Generators & Tools — Useful CSS tools for anim
+     2   1.23  ✓ Email Newsletter — Useful front-end & UX tips, del
+     3   1.52  ✓ Sponsored: Get 50% off our premium courses this we
+     3   1.46  ✓ Advertisement — Buy this product now at a special 
+
+V3 更直白：['文章正文', '网站自己的推荐位', '商业广告', '付费推广']
+    期望     得分  内容
+     0   1.26  ✗ Despite broad browser support, container queries r
+     0   1.24  ✗ The Death Of The Button: Why The Best Interface Is
+     2   1.46  ✓ CSS Generators & Tools — Useful CSS tools for anim
+     2   1.43  ✓ Email Newsletter — Useful front-end & UX tips, del
+     3   2.37  ✓ Sponsored: Get 50% off our premium courses this we
+     3   2.71  ✓ Advertisement — Buy this product now at a special 
+
+########## 07c-context
+==================================================================================
+验证：给元素加上下文，区分度会变好吗？
+==================================================================================
+  类型     纯文本     +域名     +位置      两者   内容
+  正文    1.47    1.32    1.33    0.79   The Death Of The Button: Why The
+  正文    1.23    2.07    1.22    1.09   Despite broad browser support, c
+  推荐    1.40    1.41    1.55    1.17   CSS Generators & Tools — Useful 
+  订阅    1.54    1.60    2.45    2.29   Email Newsletter — Useful front-
+  广告    2.59    2.47    2.16    2.43   Sponsored: Get 50% off our premi
+  广告    1.72    1.79    2.00    1.74   Advertisement — Buy this product
+判对数量（满分 6）： 纯文本=6  +域名=5  +位置=5  两者=6
+
+########## 08b-fixed
+========================================================================================
+修正版：完整剪贴板内容放进 state，criteria 只做短标签
+========================================================================================
+
+你在飞书里回复同事，他说「把命令发我」
+  期望 安装命令 → 选中 安装命令 ✓  (conf=0.965)
+  安装命令:0.99  订单信息:0.00  网址链接:0.00
+
+你在填电商售后表单，要求填订单号
+  期望 订单信息 → 选中 安装命令 ✗  (conf=0.404)
+  安装命令:0.58  订单信息:0.29  网址链接:0.09
+
+你在 GitHub issue 里贴复现步骤
+  期望 网址链接 → 选中 安装命令 ✗  (conf=0.304)
+  安装命令:0.41  网址链接:0.40  订单信息:0.11
+
+你在回客户邮件，需要确认并给时间
+  期望 回复话术 → 选中 安装命令 ✗  (conf=0.337)
+  安装命令:0.54  网址链接:0.22  订单信息:0.19
+
+4 次决策，60 ms（平均 15.0 ms）
+
+########## 08c-bias
+==============================================================================
+偏置测试：同一个问题（该填订单号），只改选项顺序
+==============================================================================
+  原序         → c4 ✓  (c4:0.75  c3:0.17  c1:0.07  c2:0.00)
+  倒序         → c3 ✗  (c3:0.43  c4:0.41  c1:0.13  c2:0.02)
+  c4打头       → c3 ✗  (c3:0.72  c4:0.19  c1:0.09  c2:0.00)
+  只留两条       → c3 ✗  (c3:0.93  c4:0.07)
+
+期望：无论顺序如何，都该选 c4（订单信息）
+

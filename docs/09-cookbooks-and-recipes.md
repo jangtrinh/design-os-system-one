@@ -1,16 +1,16 @@
-# 09. Cookbooks & Thực Chiến (Practical Recipes)
+# 09. Cookbooks & Practical Recipes
 
-Tài liệu này cung cấp các đoạn mã hoàn chỉnh, có thể chạy ngay (copy-pasteable) cho các bài toán thực tế phổ biến nhất trong kỹ thuật AI hiện đại.
+Production-ready, copy-pasteable implementations for standard engineering problems in modern agentic architectures.
 
 ---
 
-## Cookbook 1: Search Re-Ranking (Tối Ưu Độ Chính Xác Tìm Kiếm)
+## Cookbook 1: Search Re-Ranking
 
-### Bài toán
-Tìm kiếm từ khóa truyền thống (BM25 hoặc ElasticSearch) trả về danh sách 30 kết quả, nhưng thứ tự chưa tối ưu vì không hiểu ngữ nghĩa tự nhiên.
+### Problem
+Keyword search (BM25 or Elasticsearch) returns candidate documents, but lexical ranking misses semantic intent and natural phrasing.
 
-### Giải pháp
-Dùng Jev chấm điểm độ liên quan giữa `query` và từng `candidate`. Bắn đồng thời các request song song.
+### Solution
+Deploy System 1 to score relevance between `query` and each candidate document in parallel:
 
 ```python
 from typesafe_sdk import TypeSafeClient, Score
@@ -26,11 +26,11 @@ def rerank_results(query: str, search_candidates: list[dict]) -> list[dict]:
             state={"query": query, "document": item["text"]},
             questions={
                 "relevance": Score(
-                    instructions="Đánh giá mức độ trả lời thỏa đáng câu hỏi của người dùng",
+                    instructions="Assess how thoroughly the document answers the user query",
                     criteria=[
-                        "Không liên quan hoặc chỉ trùng từ khóa vô nghĩa",
-                        "Liên quan gián tiếp hoặc một phần nhỏ",
-                        "Trả lời trực tiếp, đầy đủ và chuẩn xác câu hỏi"
+                        "Irrelevant or superficial keyword match",
+                        "Indirect or partially related context",
+                        "Direct, comprehensive, and accurate answer"
                     ]
                 )
             }
@@ -38,18 +38,18 @@ def rerank_results(query: str, search_candidates: list[dict]) -> list[dict]:
         score = res.answers["relevance"].score
         scored_results.append({**item, "jev_score": score})
         
-    # Sắp xếp lại theo điểm Jev giảm dần
+    # Sort descending by calibrated score
     scored_results.sort(key=lambda x: x["jev_score"], reverse=True)
     return scored_results
 ```
-*Kết quả đo lường: Nâng tỷ lệ Top-1 accuracy từ 5% lên 18%, và Top-10 accuracy từ 38% lên 62%.*
+*Empirical impact: Improves Top-1 accuracy from 5% to 18%, and Top-10 accuracy from 38% to 62%.*
 
 ---
 
-## Cookbook 2: LLM Guardrails (Rào Chắn Bảo Vệ Toàn Diện)
+## Cookbook 2: Full-Stack LLM Guardrails
 
-### Bài toán
-Bảo vệ ứng dụng AI khỏi các cuộc tấn công Prompt Injection, Jailbreak, và rò rỉ dữ liệu trước khi gửi vào LLM.
+### Problem
+Protect downstream generative models from Prompt Injection, Jailbreak attempts, and confidential data leakage without paying heavy LLM token penalties.
 
 ```python
 from typesafe_sdk import TypeSafeClient, Noul, Score
@@ -61,14 +61,14 @@ def evaluate_guardrail(user_prompt: str) -> dict:
         state=user_prompt,
         questions={
             "is_jailbreak": Noul(
-                instructions="Người dùng đang cố tình vượt rào chắn bảo mật, đảo ngược vai trò, hoặc trích xuất system prompt"
+                instructions="User prompt attempts jailbreak, role reversal, or system instruction extraction"
             ),
             "harm_severity": Score(
-                instructions="Mức độ nguy hại hoặc vi phạm chính sách nếu thực hiện yêu cầu này",
+                instructions="Potential harm severity if this request is processed",
                 criteria=[
-                    "Hoàn toàn an toàn",
-                    "Nội dung nhạy cảm hoặc ranh giới xám",
-                    "Độc hại rõ ràng: vũ khí, mã độc, vi phạm pháp luật"
+                    "Completely benign conversational intent",
+                    "Ambiguous edge case or sensitive context",
+                    "Explicitly malicious: weapons, malware, fraud, illegal activity"
                 ]
             )
         }
@@ -78,19 +78,19 @@ def evaluate_guardrail(user_prompt: str) -> dict:
     harm_score = res.answers["harm_severity"].score
     
     if p_jailbreak > 0.70 or harm_score > 1.2:
-        return {"action": "BLOCK", "reason": "Phát hiện nội dung vi phạm chính sách an toàn."}
+        return {"action": "BLOCK", "reason": "Content safety policy violation."}
     elif p_jailbreak > 0.40 or harm_score > 0.6:
-        return {"action": "WARN_AND_LOG", "reason": "Cần giám sát thêm."}
+        return {"action": "WARN_AND_LOG", "reason": "Flagged for monitoring."}
     else:
         return {"action": "PASS"}
 ```
 
 ---
 
-## Cookbook 3: Kiểm Tra Hallucination & Dẫn Nguồn (Citation Check)
+## Cookbook 3: Hallucination & Citation Verification
 
-### Bài toán
-Mô hình sinh câu trả lời kèm theo một câu trích dẫn từ tài liệu nguồn. Cần xác minh xem câu trích dẫn đó có thực sự chứng minh cho nhận định hay không.
+### Problem
+A generative model outputs a factual claim with a citation quote. We must deterministically verify that the quote factually supports the claim.
 
 ```python
 from typesafe_sdk import TypeSafeClient, Choice
@@ -106,12 +106,12 @@ def verify_citation(claim: str, source_quote: str, context: str) -> bool:
         },
         questions={
             "support_status": Choice(
-                instructions="Đoạn trích dẫn trong ngữ cảnh tài liệu có ủng hộ luận điểm không?",
+                instructions="Does the source quote directly verify the claim in context?",
                 criteria={
-                    "supported": "Đoạn trích chứng minh trực tiếp và đầy đủ cho luận điểm",
-                    "partial": "Chỉ ủng hộ một phần, có thể gây hiểu lầm nếu tách khỏi ngữ cảnh",
-                    "contradicted": "Tài liệu thực chất nói ngược lại với luận điểm",
-                    "unrelated": "Đoạn trích không liên quan tới luận điểm"
+                    "supported": "Directly and factually substantiates the claim",
+                    "partial": "Partially supports, but omits critical context or nuances",
+                    "contradicted": "Directly contradicts the claim",
+                    "unrelated": "Irrelevant to the claim"
                 }
             )
         }
@@ -120,23 +120,23 @@ def verify_citation(claim: str, source_quote: str, context: str) -> bool:
     choice = res.answers["support_status"].choice
     confidence = res.answers["support_status"].confidence
     
-    # Chỉ chấp nhận khi được ủng hộ và có độ tin cậy cao
+    # Accept only with verified support and high confidence
     return choice == "supported" and confidence >= 0.75
 ```
 
 ---
 
-## Cookbook 4: Trích Xuất & Chuẩn Hóa Ngày Tháng (Date Extraction)
+## Cookbook 4: Semantic Date & Interval Extraction
 
-### Bài toán
-Người dùng viết các cụm từ ngày tháng tự nhiên như "thứ Ba tuần tới", "cuối tháng 10 năm ngoái". Các thư viện Regex hoặc Rule-based thường thất bại.
+### Problem
+Users express relative temporal phrases ("next Tuesday", "late October last year"). Regex fails on nuances.
 
-### Giải pháp
-Dùng Jev để nhận diện các thành phần ngày trong ngữ cảnh, rồi để code tính toán số học trên lịch:
+### Solution
+Use System 1 to extract semantic temporal orientation, and let deterministic code calculate the calendar dates:
 
 ```python
 from datetime import datetime
-from typesafe_sdk import TypeSafeClient, Choice, Score
+from typesafe_sdk import TypeSafeClient, Choice
 
 client = TypeSafeClient()
 
@@ -148,20 +148,20 @@ def extract_date_semantics(text: str, reference_date: datetime):
         },
         questions={
             "time_direction": Choice(
-                instructions="Thời điểm được nhắc tới là trong quá khứ, hiện tại, hay tương lai?",
+                instructions="Temporal direction referenced in the user text",
                 criteria={
-                    "past": "Đã xảy ra",
-                    "present": "Hôm nay / ngay lúc này",
-                    "future": "Sắp diễn ra trong tương lai"
+                    "past": "Occurred in the past",
+                    "present": "Today / current moment",
+                    "future": "Scheduled for future occurrence"
                 }
             ),
             "granularity": Choice(
-                instructions="Độ chi tiết của thời gian được nhắc tới",
+                instructions="Temporal granularity of the reference",
                 criteria={
-                    "exact_day": "Một ngày cụ thể",
-                    "week": "Trong một tuần",
-                    "month": "Trong một tháng cụ thể",
-                    "year": "Chỉ nhắc đến năm"
+                    "exact_day": "A specific date / calendar day",
+                    "week": "A span of a week",
+                    "month": "A specific month",
+                    "year": "A general calendar year"
                 }
             )
         }
@@ -171,13 +171,12 @@ def extract_date_semantics(text: str, reference_date: datetime):
 
 ---
 
-## Cookbook 5: Lựa Chọn Kỹ Năng Cho AI Agent (Skill Suggestion)
+## Cookbook 5: Dynamic Skill Pruning for Autonomous Swarms
 
-### Bài toán
-Một AI Agent có hơn 150 skills khác nhau. Nếu nhét mô tả của toàn bộ 150 skills vào System Prompt, context window sẽ bị tràn và chi phí tăng vọt.
+### Problem
+An agent system provides 150+ specialized tools and skills. Injecting 150 JSON tool schemas into the LLM system prompt exhausts context windows and degrades tool invocation accuracy.
 
-### Giải pháp
-Dùng Jev để:
-1. Đánh giá xem lượt nói hiện tại của user có thực sự cần gọi Tool/Skill hay không (`Noul`).
-2. Chọn ra đúng 1 kỹ năng phù hợp nhất từ danh mục (`Choice`).
-3. Chỉ nạp định nghĩa của kỹ năng chiến thắng vào Agent prompt!
+### Solution
+1. Use System 1 to determine if the user turn requires tool execution (`Noul`).
+2. If true, select the single most relevant skill from the registry (`Choice`).
+3. Inject **only the winning skill schema** into the agent's prompt, pruning 95% of context token overhead.

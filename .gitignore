@@ -17,6 +17,10 @@ build/
 *.jpg
 *.jpeg
 *daemon-state.json
+*growth-state.json
+*audit-ledger.json
+*review-queue.json
+.brv/
 
 # Python
 .venv/

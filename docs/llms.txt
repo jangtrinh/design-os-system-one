@@ -1,17 +1,17 @@
-# TypeSafe JEV & Dual-Brain System 1
+# design-os-system-one: TypeSafe System 1 & Dual-Brain Architecture
 
-> TypeSafe JEV & Dual-Brain System 1: sub-10ms on-device decisions with Laya-MLX, 5-stage speculative commit engine, and 95% LLM cost reduction for autonomous agents.
+> design-os-system-one: sub-10ms on-device decisions with Laya-MLX, 5-stage speculative commit engine, and 95% LLM cost reduction for autonomous agents.
 
 Sub-10ms Calibrated Judgments for Autonomous Agents with Zero Cloud Waste.
 
 ## Documentation & Case Study
 
-- [Landing Overview](https://jangtrinh.github.io/jev/): Main project overview, benchmarks, and interactive architecture.
-- [Case Study & Battle Journal](https://jangtrinh.github.io/jev/case-study.html): In-depth 290-line empirical benchmark report, battle journal, and speculative commit engine architecture.
-- [Architectural Patterns](https://jangtrinh.github.io/jev/08-architectural-patterns.html): Architectural patterns for agents, swarms, and browser loops.
-- [Core Primitives](https://jangtrinh.github.io/jev/02-core-primitives.html): TypeSafe System 1 decision contracts (Choice, Score, Noul).
-- [REST API Reference](https://jangtrinh.github.io/jev/05-rest-api-reference.html): API reference for System One evaluation and Gateway routing.
-- [Repository](https://github.com/jangtrinh/jev): GitHub source code, releases, and tests.
+- [Landing Overview](https://jangtrinh.github.io/design-os-system-one/): Main project overview, benchmarks, and interactive architecture.
+- [Case Study & Battle Journal](https://jangtrinh.github.io/design-os-system-one/case-study.html): In-depth empirical benchmark report, battle journal, and speculative commit engine architecture.
+- [Architectural Patterns](https://jangtrinh.github.io/design-os-system-one/08-architectural-patterns.html): Architectural patterns for agents, swarms, and browser loops.
+- [Core Primitives](https://jangtrinh.github.io/design-os-system-one/02-core-primitives.html): TypeSafe System 1 decision contracts (Choice, Score, Noul).
+- [REST API Reference](https://jangtrinh.github.io/design-os-system-one/05-rest-api-reference.html): API reference for System One evaluation and Gateway routing.
+- [Repository](https://github.com/jangtrinh/design-os-system-one): GitHub source code, releases, and tests.
 
 ## Key Architecture & Invariants
 

@@ -1,34 +1,36 @@
-# JEV Sub-Projects Directory
+# Projects & Subsystems Directory
 
-Thư mục này dùng để chứa các dự án phần mềm, PoC (Proof of Concept), microservices hoặc công cụ ứng dụng **JEV API**.
+This directory hosts production tools, proofs of concept (PoCs), and autonomous agents powered by the **System 1 Dual-Brain Architecture**.
 
 ---
 
-## 📁 Cấu Trúc Đề Xuất Cho Một Dự Án Con
-
-Mỗi dự án con nên nằm trong một thư mục riêng biệt với cấu trúc chuẩn:
+## 📁 Subsystem Overview
 
 ```text
 projects/
-├── jev-browser-cli/               # Universal Browser Automation CLI (CDP 9222 + JEV System One, Social Posting, Threads Viral Research)
+├── jev-browser-cli/               # Universal Browser Automation CLI (CDP 9222 + JEV System One, Social Posting, Threads Research)
 ├── voice-browser-agent/           # Real-time Voice Web Browser Agent (Web Speech API + Playwright)
-├── <new-project>/                 # Sẵn sàng cho dự án JEV tiếp theo
+├── laya-jev-lab/                  # Cascade routing, threshold sweep experiments, and stress benchmark suites
+└── <new-project>/                 # Ready for future autonomous agent extensions
 ```
 
 ---
 
-## 🔑 Biến Môi Trường (Environment Variables)
+## 🔑 Environment Variables
 
-Mọi dự án con cần sử dụng biến môi trường:
+Subsystems interacting with Cloud APIs require the following configuration in `.env`:
+
 ```bash
 TYPESAFE_API_KEY="ts_live_..."
 ```
 
+For purely local, air-gapped on-device workloads (`localOnly: true`), no API key or WAN connection is required.
+
 ---
 
-## 📚 Tra Cứu Tài Liệu Nhanh
+## 📚 Architectural References
 
-Khi xây dựng các dự án con, luôn tham khảo kho tri thức tại thư mục cha:
-- Xem các mẫu thiết kế: `../../docs/08-architectural-patterns.md`
-- Xem code mẫu thực chiến: `../../docs/09-cookbooks-and-recipes.md`
-- Xem chi tiết SDK: `../../docs/06-python-sdk.md` (Python) hoặc `../../docs/07-javascript-sdk.md` (Node/TypeScript)
+When authoring new agent subsystems, refer to the root documentation:
+- **Architectural Patterns**: `../docs/08-architectural-patterns.md`
+- **Cookbooks & Recipes**: `../docs/09-cookbooks-and-recipes.md`
+- **SDK References**: `../docs/06-python-sdk.md` (Python) or `../docs/07-javascript-sdk.md` (Node/TypeScript)

@@ -1,0 +1,61 @@
+============================================================================================
+Jev vs Laya 级联实测（40 条中文客服分类基准，2026-09-19）
+============================================================================================
+
+纯 Laya: 23/40 = 57%  平均 7.6ms
+纯 Jev : 31/40 = 78%  平均 588ms
+
+阈值扫描：
+  阈值 0.30: 准确率  68%  升级率  32%  平均延迟  196ms  比纯Jev快 3.0×
+  阈值 0.40: 准确率  75%  升级率  42%  平均延迟  254ms  比纯Jev快 2.3×
+  阈值 0.50: 准确率  75%  升级率  50%  平均延迟  298ms  比纯Jev快 2.0×
+  阈值 0.60: 准确率  78%  升级率  55%  平均延迟  327ms  比纯Jev快 1.8×
+  阈值 0.70: 准确率  75%  升级率  57%  平均延迟  341ms  比纯Jev快 1.7×
+  阈值 0.80: 准确率  75%  升级率  62%  平均延迟  370ms  比纯Jev快 1.6×
+  阈值 0.90: 准确率  75%  升级率  72%  平均延迟  428ms  比纯Jev快 1.4×
+  阈值 0.95: 准确率  75%  升级率  75%  平均延迟  443ms  比纯Jev快 1.3×
+  阈值 1.01: 准确率  78%  升级率 100%  平均延迟  588ms  比纯Jev快 1.0×
+
+逐条明细：
+难度          期望       Jev  conf         Laya  conf     文本
+--------------------------------------------------------------------------------------------
+清晰     billing   billing  1.00 ✓    billing  1.00 ✓   重复扣款了，第二笔要退给我。
+清晰     billing   billing  1.00 ✓    billing  0.48 ✓   怎么开发票？
+清晰     billing   billing  1.00 ✓    billing  0.96 ✓   付款失败，提示卡片被拒。
+清晰     billing   billing  1.00 ✓    billing  0.99 ✓   退款什么时候到账？
+清晰     billing   billing  1.00 ✓    billing  0.70 ✓   发票抬头写错了要改。
+清晰        tech      tech  1.00 ✓       tech  0.96 ✓   后台登录不上去。
+清晰        tech      tech  1.00 ✓    billing  1.00 ✗   接口一直返回 500。
+清晰        tech      tech  1.00 ✓       tech  0.97 ✓   页面白屏了，控制台报错。
+清晰        tech      tech  1.00 ✓       tech  0.45 ✓   数据同步不过来，一直卡住。
+清晰        tech      tech  1.00 ✓       tech  0.96 ✓   APP 闪退，安卓的。
+清晰   logistics logistics  1.00 ✓  logistics  0.88 ✓   快递到哪了？
+清晰   logistics logistics  1.00 ✓  logistics  0.99 ✓   显示已发货但我没收到。
+清晰   logistics logistics  1.00 ✓  logistics  0.87 ✓   什么时候能发货？
+清晰   logistics logistics  1.00 ✓  logistics  1.00 ✓   物流三天没更新了。
+清晰   logistics logistics  1.00 ✓       tech  0.35 ✗   地址填错了能改吗？
+清晰       sales     sales  0.99 ✓    billing  0.34 ✗   你们企业版多少钱？
+清晰       sales     sales  1.00 ✓      sales  0.83 ✓   想预约一个产品演示。
+清晰       sales     sales  1.00 ✓      sales  0.26 ✓   有没有大客户方案？
+清晰       sales     sales  1.00 ✓       tech  0.30 ✗   能开个试用账号吗？
+清晰       sales     sales  1.00 ✓    billing  0.11 ✗   想了解下你们的服务范围。
+模糊     billing   billing  0.98 ✓    billing  0.30 ✓   要退款，货也没发。
+模糊        tech      tech  0.41 ✓       tech  0.55 ✓   报错很久了，顺便能退吗？
+模糊     billing   billing  0.50 ✓  logistics  0.37 ✗   发票有问题，东西也没收到。
+模糊       sales     sales  0.20 ✓       tech  0.55 ✗   服务太差，我要投诉。
+模糊       sales      tech  1.00 ✗       tech  0.81 ✗   怎么升级？登录也不行了。
+模糊   logistics   billing  0.99 ✗  logistics  0.64 ✓   收到货了但是坏的，能退钱吗？
+模糊       sales      tech  0.50 ✗       tech  0.78 ✗   想买，但功能有 bug。
+模糊        tech      tech  0.25 ✓       tech  0.11 ✓   东西有质量问题。
+模糊     billing   billing  0.82 ✓    billing  0.95 ✓   退款要多久？另外东西还没发。
+模糊        tech      tech  0.95 ✓       tech  0.90 ✓   登录不了，顺便问下有没有企业版。
+边界       sales     sales  0.98 ✓       tech  0.15 ✗   你好。
+边界       sales     sales  0.95 ✓       tech  0.12 ✗   在吗
+边界       sales      tech  0.62 ✗      sales  0.12 ✓   转人工
+边界       sales     sales  0.73 ✓    billing  0.07 ✗   谢谢
+边界       sales      tech  0.82 ✗       tech  0.18 ✗   test
+边界       sales     sales  0.31 ✓       tech  0.09 ✗   ...
+边界       sales logistics  0.94 ✗  logistics  0.43 ✗   请问地址在哪
+边界        tech     sales  0.63 ✗       tech  0.16 ✓   文档链接给我一下
+边界       sales      tech  0.74 ✗       tech  0.08 ✗   help
+边界       sales      tech  0.45 ✗       tech  0.21 ✗   ???

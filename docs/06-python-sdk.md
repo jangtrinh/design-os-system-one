@@ -1,30 +1,30 @@
-# 06. Hướng Dẫn Python SDK (`typesafe-sdk`)
+# 06. Python SDK Reference (`typesafe-sdk`)
 
-SDK chính thức của TypeSafe AI dành cho hệ sinh thái Python (hỗ trợ Python >= 3.10).
+Official client SDK for integrating TypeSafe System One into Python applications (Python >= 3.10).
 
 ---
 
-## 1. Cài Đặt (Installation)
+## 1. Installation
 
 ```bash
-# Sử dụng pip
+# Using pip
 pip install typesafe-sdk
 
-# Hoặc sử dụng uv (khuyên dùng)
+# Or using uv (recommended)
 uv add typesafe-sdk
 ```
 
 ---
 
-## 2. Cấu Hình Khóa API
+## 2. API Key Configuration
 
-SDK tự động đọc biến môi trường `TYPESAFE_API_KEY`:
+The SDK automatically resolves `TYPESAFE_API_KEY` from environment variables:
 
 ```bash
 export TYPESAFE_API_KEY="ts_live_your_api_key_here"
 ```
 
-Hoặc truyền trực tiếp vào client:
+Or pass it explicitly during client initialization:
 
 ```python
 from typesafe_sdk import TypeSafeClient
@@ -34,7 +34,7 @@ client = TypeSafeClient(api_key="ts_live_your_api_key_here")
 
 ---
 
-## 3. Đồng Bộ (Synchronous Client)
+## 3. Synchronous Client
 
 ```python
 import os
@@ -43,54 +43,54 @@ from typesafe_sdk import TypeSafeClient, Choice, Score, Noul
 client = TypeSafeClient()
 
 customer_feedback = """
-Ứng dụng tải quá chậm khi mở danh mục sản phẩm lớn, thỉnh thoảng còn bị crash văng ra màn hình chính. 
-Tôi dùng iPhone 14 Pro, iOS 17.5.
+The app is extremely sluggish when browsing large product catalogs, and occasionally crashes to the home screen. 
+I am testing on an iPhone 14 Pro, iOS 17.5.
 """
 
 response = client.system_one(
     state=customer_feedback,
-    model="jev-latest", # Tùy chọn, mặc định là jev-latest
+    model="jev-latest", # Optional, defaults to jev-latest
     questions={
         "category": Choice(
-            instructions="Phân loại vấn đề kỹ thuật",
+            instructions="Classify reported technical issue",
             criteria={
-                "perf_issue": "Hiệu năng, tốc độ tải chậm, lag",
-                "crash_bug": "Sập ứng dụng, văng app, crash",
-                "ui_ux": "Giao diện khó dùng, lỗi hiển thị"
+                "perf_issue": "Performance degradation, slow latency, stutter",
+                "crash_bug": "Application termination, fatal crash",
+                "ui_ux": "Layout glitch, visual defect, usability issue"
             }
         ),
         "severity": Score(
-            instructions="Mức độ nghiêm trọng của lỗi ảnh hưởng tới người dùng",
+            instructions="Impact severity on user workflow",
             criteria=[
-                "Khó chịu nhỏ, vẫn dùng được",
-                "Gây gián đoạn trải nghiệm đáng kể",
-                "Không thể sử dụng được dịch vụ, chặn người dùng hoàn toàn"
+                "Minor annoyance, core workflow unimpeded",
+                "Substantial friction, partial feature disruption",
+                "Catastrophic blocker, core functionality completely inaccessible"
             ]
         ),
         "has_device_info": Noul(
-            instructions="Người dùng có cung cấp thông tin thiết bị / phiên bản OS cụ thể không?"
+            instructions="Does the report specify hardware model and OS version?"
         )
     }
 )
 
-# Truy xuất kết quả
+# Extract structured results
 category = response.answers["category"]
-print(f"Lựa chọn chính: {category.choice}")
-print(f"Xác suất từng mục: {category.probabilities}")
-print(f"Độ tin cậy: {category.confidence}")
+print(f"Primary Selection: {category.choice}")
+print(f"Probabilities: {category.probabilities}")
+print(f"Epistemic Confidence: {category.confidence}")
 
 severity = response.answers["severity"]
-print(f"Điểm nghiêm trọng (0-2): {severity.score:.2f}")
+print(f"Continuous Score (0-2 scale): {severity.score:.2f}")
 
 device_info = response.answers["has_device_info"]
-print(f"Có thông tin thiết bị: {device_info.noul >= 0.8} (P = {device_info.noul})")
+print(f"Hardware Provided: {device_info.noul >= 0.8} (P = {device_info.noul})")
 ```
 
 ---
 
-## 4. Bất Đồng Bộ (Asynchronous Client: `AsyncTypeSafeClient`)
+## 4. Asynchronous Client (`AsyncTypeSafeClient`)
 
-Rất hữu ích cho FastAPI, aiohttp, Celery worker hoặc khi cần bắn hàng loạt request song song:
+Essential for FastAPI, aiohttp, Celery, or high-throughput parallel evaluation loops:
 
 ```python
 import asyncio
@@ -101,7 +101,7 @@ async def check_single_passage(client: AsyncTypeSafeClient, query: str, passage:
         state={"query": query, "passage": passage},
         questions={
             "is_relevant": Noul(
-                instructions="Đoạn văn bản có trả lời trực tiếp hoặc gián tiếp cho câu hỏi không?"
+                instructions="Does this passage directly or indirectly answer the query?"
             )
         }
     )
@@ -110,16 +110,16 @@ async def check_single_passage(client: AsyncTypeSafeClient, query: str, passage:
 async def main():
     async with AsyncTypeSafeClient() as client:
         passages = [
-            "Đoạn văn 1...",
-            "Đoạn văn 2...",
-            "Đoạn văn 3..."
+            "Passage 1 content...",
+            "Passage 2 content...",
+            "Passage 3 content..."
         ]
         tasks = [
-            check_single_passage(client, "Cách hủy tài khoản", p)
+            check_single_passage(client, "How to delete account", p)
             for p in passages
         ]
         results = await asyncio.gather(*tasks)
-        print("Điểm liên quan của các đoạn văn:", results)
+        print("Relevance probabilities:", results)
 
 if __name__ == "__main__":
     asyncio.run(main())
@@ -127,28 +127,26 @@ if __name__ == "__main__":
 
 ---
 
-## 5. Cấu Hình Retry Policy & Timeout
+## 5. Retry Policy & Timeout Configuration
 
-Khi triển khai trên Production, luôn cấu hình Timeout và Retry Policy để chống sụt giảm kết nối mạng:
+In production microservices, configure explicit timeouts and jittered retry policies:
 
 ```python
 from typesafe_sdk import TypeSafeClient, RetryPolicy
 
 client = TypeSafeClient(
-    timeout=15.0,  # Thời gian chờ tối đa 15 giây
+    timeout=15.0,  # 15s timeout ceiling
     retry_policy=RetryPolicy(
-        max_retries=3,          # Thử lại tối đa 3 lần
-        backoff_factor=1.5,     # Hệ số tăng dần thời gian chờ (Exponential backoff)
-        retry_statuses=[429, 500, 502, 503, 504] # Các mã lỗi được tự động retry
+        max_retries=3,          # Up to 3 attempts
+        backoff_factor=1.5,     # Exponential backoff factor
+        retry_statuses=[429, 500, 502, 503, 504] # Transient error codes to retry
     )
 )
 ```
 
 ---
 
-## 6. Xử Lý Ngoại Lệ (Exception Handling)
-
-SDK phân loại các lớp ngoại lệ rõ ràng:
+## 6. Exception Hierarchy
 
 ```python
 from typesafe_sdk.exceptions import (
@@ -162,11 +160,11 @@ from typesafe_sdk.exceptions import (
 try:
     response = client.system_one(state=..., questions=...)
 except AuthenticationError:
-    print("Khóa API không hợp lệ. Vui lòng kiểm tra TYPESAFE_API_KEY.")
+    print("Invalid API Key. Verify TYPESAFE_API_KEY environment variable.")
 except RateLimitError as e:
-    print(f"Bị giới hạn tốc độ gọi API: {e}. Cần giãn tần suất gọi.")
+    print(f"Rate limit exceeded: {e}. Back off request velocity.")
 except APIConnectionError:
-    print("Mất kết nối mạng tới https://api.typesafe.ai")
+    print("Network disruption connecting to https://api.typesafe.ai")
 except TypeSafeError as e:
-    print(f"Lỗi chung từ TypeSafe SDK: {e}")
+    print(f"TypeSafe SDK generic exception: {e}")
 ```

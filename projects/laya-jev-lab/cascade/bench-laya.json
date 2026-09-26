@@ -1,0 +1,362 @@
+[
+  {
+    "text": "重复扣款了，第二笔要退给我。",
+    "expect": "billing",
+    "diff": "清晰",
+    "choice": "billing",
+    "conf": 0.9993,
+    "ok": true,
+    "ms": 38.4
+  },
+  {
+    "text": "怎么开发票？",
+    "expect": "billing",
+    "diff": "清晰",
+    "choice": "billing",
+    "conf": 0.4813,
+    "ok": true,
+    "ms": 7.8
+  },
+  {
+    "text": "付款失败，提示卡片被拒。",
+    "expect": "billing",
+    "diff": "清晰",
+    "choice": "billing",
+    "conf": 0.9641,
+    "ok": true,
+    "ms": 6.3
+  },
+  {
+    "text": "退款什么时候到账？",
+    "expect": "billing",
+    "diff": "清晰",
+    "choice": "billing",
+    "conf": 0.9856,
+    "ok": true,
+    "ms": 6.5
+  },
+  {
+    "text": "发票抬头写错了要改。",
+    "expect": "billing",
+    "diff": "清晰",
+    "choice": "billing",
+    "conf": 0.7012,
+    "ok": true,
+    "ms": 6.5
+  },
+  {
+    "text": "后台登录不上去。",
+    "expect": "tech",
+    "diff": "清晰",
+    "choice": "tech",
+    "conf": 0.9604,
+    "ok": true,
+    "ms": 6.4
+  },
+  {
+    "text": "接口一直返回 500。",
+    "expect": "tech",
+    "diff": "清晰",
+    "choice": "billing",
+    "conf": 0.997,
+    "ok": false,
+    "ms": 6.4
+  },
+  {
+    "text": "页面白屏了，控制台报错。",
+    "expect": "tech",
+    "diff": "清晰",
+    "choice": "tech",
+    "conf": 0.9656,
+    "ok": true,
+    "ms": 6.6
+  },
+  {
+    "text": "数据同步不过来，一直卡住。",
+    "expect": "tech",
+    "diff": "清晰",
+    "choice": "tech",
+    "conf": 0.449,
+    "ok": true,
+    "ms": 6.5
+  },
+  {
+    "text": "APP 闪退，安卓的。",
+    "expect": "tech",
+    "diff": "清晰",
+    "choice": "tech",
+    "conf": 0.9634,
+    "ok": true,
+    "ms": 7.2
+  },
+  {
+    "text": "快递到哪了？",
+    "expect": "logistics",
+    "diff": "清晰",
+    "choice": "logistics",
+    "conf": 0.8799,
+    "ok": true,
+    "ms": 7.3
+  },
+  {
+    "text": "显示已发货但我没收到。",
+    "expect": "logistics",
+    "diff": "清晰",
+    "choice": "logistics",
+    "conf": 0.9906,
+    "ok": true,
+    "ms": 7.1
+  },
+  {
+    "text": "什么时候能发货？",
+    "expect": "logistics",
+    "diff": "清晰",
+    "choice": "logistics",
+    "conf": 0.8723,
+    "ok": true,
+    "ms": 6.7
+  },
+  {
+    "text": "物流三天没更新了。",
+    "expect": "logistics",
+    "diff": "清晰",
+    "choice": "logistics",
+    "conf": 0.9998,
+    "ok": true,
+    "ms": 6.5
+  },
+  {
+    "text": "地址填错了能改吗？",
+    "expect": "logistics",
+    "diff": "清晰",
+    "choice": "tech",
+    "conf": 0.3472,
+    "ok": false,
+    "ms": 6.3
+  },
+  {
+    "text": "你们企业版多少钱？",
+    "expect": "sales",
+    "diff": "清晰",
+    "choice": "billing",
+    "conf": 0.3385,
+    "ok": false,
+    "ms": 6.3
+  },
+  {
+    "text": "想预约一个产品演示。",
+    "expect": "sales",
+    "diff": "清晰",
+    "choice": "sales",
+    "conf": 0.8317,
+    "ok": true,
+    "ms": 6.2
+  },
+  {
+    "text": "有没有大客户方案？",
+    "expect": "sales",
+    "diff": "清晰",
+    "choice": "sales",
+    "conf": 0.2618,
+    "ok": true,
+    "ms": 6.3
+  },
+  {
+    "text": "能开个试用账号吗？",
+    "expect": "sales",
+    "diff": "清晰",
+    "choice": "tech",
+    "conf": 0.2993,
+    "ok": false,
+    "ms": 6.3
+  },
+  {
+    "text": "想了解下你们的服务范围。",
+    "expect": "sales",
+    "diff": "清晰",
+    "choice": "billing",
+    "conf": 0.1101,
+    "ok": false,
+    "ms": 6.3
+  },
+  {
+    "text": "要退款，货也没发。",
+    "expect": "billing",
+    "diff": "模糊",
+    "choice": "billing",
+    "conf": 0.3011,
+    "ok": true,
+    "ms": 6.7
+  },
+  {
+    "text": "报错很久了，顺便能退吗？",
+    "expect": "tech",
+    "diff": "模糊",
+    "choice": "tech",
+    "conf": 0.5549,
+    "ok": true,
+    "ms": 6.4
+  },
+  {
+    "text": "发票有问题，东西也没收到。",
+    "expect": "billing",
+    "diff": "模糊",
+    "choice": "logistics",
+    "conf": 0.3684,
+    "ok": false,
+    "ms": 6.3
+  },
+  {
+    "text": "服务太差，我要投诉。",
+    "expect": "sales",
+    "diff": "模糊",
+    "choice": "tech",
+    "conf": 0.548,
+    "ok": false,
+    "ms": 6.5
+  },
+  {
+    "text": "怎么升级？登录也不行了。",
+    "expect": "sales",
+    "diff": "模糊",
+    "choice": "tech",
+    "conf": 0.8123,
+    "ok": false,
+    "ms": 6.5
+  },
+  {
+    "text": "收到货了但是坏的，能退钱吗？",
+    "expect": "logistics",
+    "diff": "模糊",
+    "choice": "logistics",
+    "conf": 0.6404,
+    "ok": true,
+    "ms": 6.7
+  },
+  {
+    "text": "想买，但功能有 bug。",
+    "expect": "sales",
+    "diff": "模糊",
+    "choice": "tech",
+    "conf": 0.7848,
+    "ok": false,
+    "ms": 6.3
+  },
+  {
+    "text": "东西有质量问题。",
+    "expect": "tech",
+    "diff": "模糊",
+    "choice": "tech",
+    "conf": 0.1096,
+    "ok": true,
+    "ms": 6.2
+  },
+  {
+    "text": "退款要多久？另外东西还没发。",
+    "expect": "billing",
+    "diff": "模糊",
+    "choice": "billing",
+    "conf": 0.9509,
+    "ok": true,
+    "ms": 6.2
+  },
+  {
+    "text": "登录不了，顺便问下有没有企业版。",
+    "expect": "tech",
+    "diff": "模糊",
+    "choice": "tech",
+    "conf": 0.9028,
+    "ok": true,
+    "ms": 6.1
+  },
+  {
+    "text": "你好。",
+    "expect": "sales",
+    "diff": "边界",
+    "choice": "tech",
+    "conf": 0.1473,
+    "ok": false,
+    "ms": 6.5
+  },
+  {
+    "text": "在吗",
+    "expect": "sales",
+    "diff": "边界",
+    "choice": "tech",
+    "conf": 0.1182,
+    "ok": false,
+    "ms": 6.4
+  },
+  {
+    "text": "转人工",
+    "expect": "sales",
+    "diff": "边界",
+    "choice": "sales",
+    "conf": 0.1201,
+    "ok": true,
+    "ms": 6.4
+  },
+  {
+    "text": "谢谢",
+    "expect": "sales",
+    "diff": "边界",
+    "choice": "billing",
+    "conf": 0.0749,
+    "ok": false,
+    "ms": 6.5
+  },
+  {
+    "text": "test",
+    "expect": "sales",
+    "diff": "边界",
+    "choice": "tech",
+    "conf": 0.1808,
+    "ok": false,
+    "ms": 6.6
+  },
+  {
+    "text": "...",
+    "expect": "sales",
+    "diff": "边界",
+    "choice": "tech",
+    "conf": 0.0856,
+    "ok": false,
+    "ms": 6.4
+  },
+  {
+    "text": "请问地址在哪",
+    "expect": "sales",
+    "diff": "边界",
+    "choice": "logistics",
+    "conf": 0.4271,
+    "ok": false,
+    "ms": 6.3
+  },
+  {
+    "text": "文档链接给我一下",
+    "expect": "tech",
+    "diff": "边界",
+    "choice": "tech",
+    "conf": 0.1571,
+    "ok": true,
+    "ms": 6.4
+  },
+  {
+    "text": "help",
+    "expect": "sales",
+    "diff": "边界",
+    "choice": "tech",
+    "conf": 0.081,
+    "ok": false,
+    "ms": 6.3
+  },
+  {
+    "text": "???",
+    "expect": "sales",
+    "diff": "边界",
+    "choice": "tech",
+    "conf": 0.2125,
+    "ok": false,
+    "ms": 6.1
+  }
+]

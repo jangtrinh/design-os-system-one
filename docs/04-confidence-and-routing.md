@@ -1,61 +1,61 @@
-# 04. Confidence & Định Tuyến Tin Cậy (Confidence & Routing)
+# 04. Confidence Signals & Gated Routing
 
-Một trong những tính năng đột phá nhất của Jev là khả năng cung cấp đồng thời hai chỉ số toán học độc lập: **Xác suất (Probability)** và **Độ tin cậy nhận thức (Confidence)**.
+A signature breakthrough of the System 1 architecture is the ability to emit two independent mathematical coordinates simultaneously: **Calibrated Probability** and **Epistemic Confidence**.
 
 ---
 
-## 1. Phân Biệt: Probability vs Confidence
+## 1. Probability vs Confidence
 
-Hầu hết các kỹ sư nhầm lẫn giữa Probability và Confidence. Hãy xem bảng so sánh:
+Many engineering teams conflate probability with confidence. The distinction is vital:
 
-| Khái Niệm | Trả Lời Cho Câu Hỏi Nào? | Ví Dụ Đời Thực |
+| Metric | Question It Answers | Physical Intuition |
 | :--- | :--- | :--- |
-| **Probability (Xác Suất)** | *Khả năng sự kiện này xảy ra là bao nhiêu phần trăm?* | "Đồng xu này tung lên có 50% ra mặt Ngửa." |
-| **Confidence (Độ Tin Cậy)** | *Dữ liệu hiện tại có đủ đầy đủ và rõ ràng để ta chắc chắn về nhận định đó hay không?* | "Tôi đã kiểm tra đồng xu rất kỹ, không méo mó, tôi chắc chắn 99% rằng xác suất là 50/50." |
+| **Probability ($P$)** | *What is the likelihood of this event occurring?* | "This coin flip has a 50% probability of landing on Heads." |
+| **Confidence ($C$)** | *Does the available evidence suffice to be certain of that evaluation?* | "I inspected the coin thoroughly under a microscope; I am 99% confident the true distribution is 50/50." |
 
-### Ma trận 4 góc phần tư quyết định (Decision Matrix)
+### The 4-Quadrant Decision Matrix
 
 ```
-                       Độ Tin Cậy (Confidence) Cao
-                                    ▲
-                                    │
-           [GÓC 2: RÕ RÀNG KHÔNG]  │   [GÓC 1: TỰ ĐỘNG HÓA HOÀN TOÀN]
-          P(Spam) = 0.05, Conf = 0.95│  P(Spam) = 0.98, Conf = 0.97
-          => Cho qua thẳng an toàn   │  => Chặn ngay lập tức, không cần hỏi
-                                    │
-    ────────────────────────────────┼────────────────────────────────► Xác Suất (Probability)
-                                    │
-           [GÓC 3: MƠ HỒ, THIẾU INFO]│   [GÓC 4: RỦI RO CAO / NỬA VỜI]
-          P(Spam) = 0.20, Conf = 0.35│  P(Spam) = 0.85, Conf = 0.40
-          => Tin nhắn quá ngắn/kỳ lạ  │  => Cần người duyệt (Human Review)
-                                    │
-                                    ▼
-                       Độ Tin Cậy (Confidence) Thấp
+                        High Confidence (Certainty)
+                                     ▲
+                                     │
+           [QUADRANT 2: DEFINITIVELY NO] │   [QUADRANT 1: FULLY AUTONOMOUS]
+          P(Spam) = 0.05, Conf = 0.95   │  P(Spam) = 0.98, Conf = 0.97
+          => Whitelist / Allow through   │  => Block immediately without review
+                                        │
+     ───────────────────────────────────┼───────────────────────────────────► Probability
+                                        │
+           [QUADRANT 3: AMBIGUOUS DATA]  │   [QUADRANT 4: HIGH RISK / ESCALATE]
+          P(Spam) = 0.20, Conf = 0.30   │  P(Spam) = 0.85, Conf = 0.38
+          => Input too brief / Ask user │  => Human-in-the-Loop review queue
+                                        │
+                                        ▼
+                        Low Confidence (Uncertainty)
 ```
 
-### Trường hợp kinh điển: Dữ liệu thiếu / Mơ hồ
-- Giả sử khách hàng chỉ gửi đúng một từ: `"help"`.
-- Một câu hỏi `Noul` hỏi: *"Khách hàng có muốn thanh toán hóa đơn không?"*
-- Mô hình có thể đưa ra $P(\text{Yes}) = 0.30$, nhưng `confidence` sẽ rất thấp (ví dụ: $0.20$), vì chỉ với một từ `"help"` thì không có đủ ngữ cảnh để khẳng định.
-- Nếu không có `confidence`, hệ thống tự động sẽ coi $0.30 < 0.5$ và bỏ qua. Nhưng nhờ có `confidence = 0.20`, code của bạn có thể phát hiện sự mơ hồ và hỏi lại người dùng: *"Bạn cần hỗ trợ về chủ đề gì?"*.
+### The Ambiguous Edge Case
+- Suppose a user enters a single word: `"help"`.
+- A `Noul` question queries: *"Does the customer request invoice cancellation?"*
+- The model might output $P(\text{Yes}) = 0.30$, but `confidence` will be low ($0.20$), because a single word `"help"` lacks sufficient information to draw a firm conclusion.
+- In a naive system, $0.30 < 0.50$ would silently treat the result as "No". In `design-os-system-one`, low confidence ($0.20 < 0.80$) triggers an escalation branch: *"Could you clarify your request?"*.
 
 ---
 
-## 2. Mô Hình Kiến Trúc: Confidence-Gated Routing
+## 2. Confidence-Gated Routing Pattern
 
-Trong kiến trúc này, **Câu trả lời (`choice`/`score`/`noul`) cho bạn biết NÊN LÀM GÌ, còn `confidence` quyết định CÓ ĐƯỢC TỰ ĐỘNG LÀM HAY KHÔNG**.
+Under this paradigm: **The categorical judgment (`choice` / `score` / `noul`) tells you WHAT to do; `confidence` tells you WHETHER YOU ARE PERMITTED TO DO IT AUTONOMOUSLY.**
 
 ```python
-# Ví dụ triển khai Confidence-Gated Routing trong Python
+# Production Confidence-Gated Routing implementation
 response = client.system_one(
     state=customer_ticket,
     questions={
         "action": Choice(
-            instructions="Chọn hành động xử lý ticket",
+            instructions="Select ticket remediation action",
             criteria={
-                "auto_refund": "Hoàn tiền tự động cho lỗi phát sinh dưới $50",
-                "escalate_tier2": "Chuyển lên kỹ thuật viên cấp 2",
-                "send_faq": "Gửi tài liệu hướng dẫn thường gặp"
+                "auto_refund": "Automated refund for billing glitches under $50",
+                "escalate_tier2": "Escalate to tier-2 network engineer",
+                "send_faq": "Dispatch self-service documentation"
             }
         )
     }
@@ -68,10 +68,10 @@ confidence = answer.confidence
 CONFIDENCE_THRESHOLD = 0.80
 
 if confidence >= CONFIDENCE_THRESHOLD:
-    # Đạt ngưỡng tự tin: Thực thi tự động
+    # High confidence: Execute mutation autonomously
     execute_action(selected_action)
 else:
-    # Dưới ngưỡng: Chuyển sang hàng đợi nhân viên hỗ trợ (Human-in-the-loop)
+    # Low confidence: Route to human supervisor queue
     route_to_human_agent(
         ticket=customer_ticket,
         suggested_action=selected_action,
@@ -82,9 +82,9 @@ else:
 
 ---
 
-## 3. Kỹ Thuật Self-Consistency (Tự Kiểm Tra Nhất Quán)
+## 3. Self-Consistency Verification
 
-Khi làm việc với các quyết định mang tính pháp lý, tài chính hoặc kiểm duyệt nội dung (Trust & Safety), bạn có thể kết hợp:
-1. Đặt câu hỏi thuận: *"Nội dung này có vi phạm chính sách bạo lực không?"*
-2. Đặt câu hỏi nghịch: *"Nội dung này có hoàn toàn an toàn và tuân thủ cộng đồng không?"*
-3. Đánh giá độ nhất quán: Nếu câu thuận trả về $P = 0.90$ mà câu nghịch trả về $P = 0.80$ (tổng xác suất phi lý), điều đó phản ánh văn bản có tính châm biếm, hai nghĩa hoặc mâu thuẫn nội tại $\rightarrow$ kích hoạt cờ cảnh báo để xem xét kỹ lưỡng.
+For mission-critical operations (financial audits, content moderation, access delegation), deploy self-consistency verification:
+1. Issue the affirmative question: *"Does this content violate safety policy?"*
+2. Issue the converse question: *"Is this content completely safe and compliant?"*
+3. Compare distributions: If the affirmative returns $P = 0.90$ and the converse also returns $P = 0.80$ (a mathematically impossible combined distribution), the input exhibits contradictory sarcasm or adversarial phrasing $\rightarrow$ automatically raise an alert for frontier LLM arbitration or human audit.

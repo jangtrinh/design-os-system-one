@@ -1,24 +1,24 @@
-# 03. Quản Trị State & Ngữ Cảnh (State and Context)
+# 03. State & Context Engineering
 
-Trong kiến trúc của Jev, **`State`** là nguồn dữ liệu ngữ cảnh duy nhất mà mô hình tiếp nhận để đánh giá câu hỏi. Không giống như LLM truyền thống cần những prompt dài dòng kèm theo các câu lệnh dặn dò ("Bạn là một trợ lý AI thông minh... Hãy trả về định dạng..."), Jev tiếp nhận `state` dưới dạng dữ liệu thuần túy (pure data).
+In the `design-os-system-one` architecture, **`State`** is the single source of contextual truth ingested by the model to evaluate questions. Unlike conventional LLMs that require verbose meta-prompts ("You are an intelligent AI assistant... Please return strict JSON..."), System 1 ingests `state` as pure, unadorned data.
 
 ---
 
-## 1. Định Dạng Của `State`
+## 1. Supported State Formats
 
-Jev hỗ trợ `state` dưới nhiều hình thức linh hoạt:
+The System 1 engine supports heterogeneous data representations:
 
-### A. Chuỗi Văn Bản Tự Do (Plain String)
-Phù hợp cho email, tin nhắn hỗ trợ, bài đăng mạng xã hội, đoạn trích sách, điều khoản dịch vụ.
+### A. Plain Text Strings
+Optimal for emails, customer support tickets, chat logs, code excerpts, and legal clauses.
 ```json
 {
-  "state": "Xin chào, tôi không thể đăng nhập được vào hệ thống kể từ khi bật 2FA sáng nay. Mã SMS không gửi về máy.",
+  "state": "Hello, I have been unable to log into my account since enabling SMS 2FA this morning. The verification codes never arrive.",
   "questions": { ... }
 }
 ```
 
-### B. Đối Tượng Cấu Trúc (JSON Object / Dictionary)
-Phù hợp khi bạn có nhiều trường dữ liệu đã được thu thập từ database hoặc các dịch vụ khác.
+### B. Structured Objects (JSON Dictionaries)
+Optimal when aggregating database entities, account metadata, and session telemetry.
 ```json
 {
   "state": {
@@ -26,19 +26,19 @@ Phù hợp khi bạn có nhiều trường dữ liệu đã được thu thập 
     "account_age_days": 450,
     "last_payment_status": "succeeded",
     "open_tickets_count": 3,
-    "message": "Hệ thống API webhook đang bị delay hơn 15 phút. Chúng tôi đang mất giao dịch khách hàng."
+    "message": "Webhook delivery is currently delayed by over 15 minutes. We are dropping critical customer transactions."
   },
   "questions": { ... }
 }
 ```
-*Jev tự động phân tích các key và giá trị trong JSON để hiểu mối tương quan giữa ngữ cảnh tài khoản và tin nhắn.*
+*The model parses JSON keys and values to capture correlations between user tier, historical reliability, and incident severity.*
 
-### C. Danh Sách Mảng (Array of Items)
-Phù hợp khi cần so sánh, tìm kiếm hoặc trích xuất từ một danh sách:
+### C. Arrays of Candidate Items
+Optimal for re-ranking, candidate filtering, or extraction:
 ```json
 {
   "state": {
-    "query": "laptop mỏng nhẹ cho lập trình viên",
+    "query": "lightweight laptop for software engineering",
     "candidates": [
       {"id": "p1", "name": "ThinkPad X1 Carbon Gen 11", "weight": "1.12kg", "cpu": "i7-1365U"},
       {"id": "p2", "name": "ASUS ROG Strix G16", "weight": "2.5kg", "cpu": "i9-13980HX"},
@@ -51,41 +51,41 @@ Phù hợp khi cần so sánh, tìm kiếm hoặc trích xuất từ một danh 
 
 ---
 
-## 2. Nguyên Tắc Vàng Khi Thiết Kế `State` (State Hygiene)
+## 2. Golden Rules for State Hygiene
 
-### 1. Giữ State Thuần Túy (Pure Facts, No Meta-Instructions)
-❌ **Sai**: Đưa cả câu lệnh điều khiển vào State:
+### 1. Pure Facts, Zero Meta-Instructions
+❌ **Anti-pattern**: Embedding prompts and reasoning instructions inside the State:
 ```json
 {
-  "state": "Sau đây là tin nhắn của khách hàng. Hãy đọc kỹ và xác định xem có tức giận không: 'Tôi muốn hủy gói'."
+  "state": "Below is a user message. Carefully analyze if they are angry: 'I want to cancel my subscription'."
 }
 ```
-✅ **Đúng**: Tách bạch dữ liệu vào `state` và câu hỏi vào `instructions`:
+✅ **Correct**: Cleanly isolate evidence into `state` and intent into `instructions`:
 ```json
 {
-  "state": "Tôi muốn hủy gói.",
+  "state": "I want to cancel my subscription.",
   "questions": {
     "is_cancellation": {
       "type": "noul",
-      "instructions": "Khách hàng muốn hủy gói đăng ký"
+      "instructions": "The customer requests subscription termination"
     }
   }
 }
 ```
 
-### 2. Loại Bỏ Nhiễu (Context Pruning)
-Jev có khả năng đọc hiểu ngữ cảnh tốt, nhưng việc đưa vào các dữ liệu rác (như HTML boilerplate, token CSS, cookie session, ID nội bộ không mang ý nghĩa ngữ nghĩa) sẽ làm giảm độ chính xác và lãng phí token.
-- Hãy loại bỏ các thẻ HTML rườm rà, chỉ giữ lại Markdown sạch.
-- Rút gọn JSON: chỉ gửi các trường liên quan đến quyết định.
+### 2. Context Pruning
+Feeding raw HTML boilerplate, CSS class tokens, tracking scripts, and irrelevant database UUIDs degrades calibration and inflates processing latency.
+- Strip HTML markup and provide clean Markdown or structured JSON.
+- Prune extraneous fields; transmit only data relevant to the decision gate.
 
-### 3. Đánh Dấu Cấu Trúc Bằng Khóa Có Nghĩa
-Nếu bạn gửi đối tượng JSON, hãy đặt tên key rõ ràng (`customer_history`, `order_status`, `error_log`). Jev sử dụng chính ngữ nghĩa của key để định vị thông tin liên quan tới câu hỏi.
+### 3. Semantic Key Labeling
+When passing JSON objects, use self-documenting keys (`customer_history`, `order_status`, `error_trace`). System 1 leverages key semantics to locate evidence relevant to the question.
 
 ---
 
-## 3. Quản Lý Kích Thước State (Context Budgeting)
+## 3. Context Budgeting & Long Documents
 
-- **Ngưỡng tối ưu**: Các quyết định System One đạt độ chính xác cao nhất và độ trễ thấp nhất khi `state` chứa khoảng từ 50 đến 4.000 tokens (tương đương 1-10 trang văn bản súc tích).
-- **Xử lý tài liệu dài (TOS, Hợp đồng, Log lớn)**:
-  - Nếu tài liệu quá dài (hàng chục nghìn dòng), hãy áp dụng kỹ thuật **Chunking** hoặc **BM25 Pre-filtering** để tìm ra các đoạn liên quan trước.
-  - Sử dụng Jev làm tầng **Re-ranking** hoặc **Line-by-line verification** (xem chi tiết tại phần Cookbooks).
+- **Optimal Operating Range**: System 1 decisions achieve highest precision and lowest latency when `state` is sized between 50 and 4,000 tokens (1–10 pages of clean text).
+- **Processing Extended Documents (Contracts, System Logs)**:
+  - For massive corpora (> 8,000 tokens), employ BM25 pre-filtering or semantic chunking first.
+  - Employ System 1 as the high-speed re-ranking or verification layer across chunks (refer to the Cookbooks section).

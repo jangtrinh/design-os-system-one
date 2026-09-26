@@ -1,28 +1,28 @@
-# 02. Các Primitives Cốt Lõi (Core Primitives)
+# 02. Core Primitives (Choice, Score, Noul)
 
-Trong Jev / TypeSafe AI, mọi tương tác với mô hình đều xoay quanh **3 kiểu câu hỏi nguyên thủy (Primitives)**. Mỗi kiểu được thiết kế để giải quyết một dạng quyết định cụ thể trong kỹ thuật phần mềm.
+In `design-os-system-one`, every interaction with the System 1 engine centers around **3 primitive question types**. Each is engineered to solve a distinct class of deterministic software decisions.
 
 ---
 
-## 1. `Choice` (Lựa Chọn Trong Tập Hữu Hạn)
+## 1. `Choice` (Discrete Finite Classification)
 
-### Mục đích
-Sử dụng khi bạn cần phân loại nội dung hoặc chọn **duy nhất 1 lựa chọn** từ một danh sách các phương án cho trước (`criteria`).
+### Purpose
+Used when classifying state into **exactly one choice** from a predefined set of mutual options (`criteria`).
 
-### Cấu trúc câu hỏi
+### Question Schema
 ```json
 {
   "type": "choice",
-  "instructions": "Mô tả tiêu chí lựa chọn",
+  "instructions": "Selection criteria description",
   "criteria": {
-    "key_1": "Mô tả chi tiết phương án 1",
-    "key_2": "Mô tả chi tiết phương án 2",
-    "key_3": "Mô tả chi tiết phương án 3"
+    "key_1": "Detailed criteria for option 1",
+    "key_2": "Detailed criteria for option 2",
+    "key_3": "Detailed criteria for option 3"
   }
 }
 ```
 
-### Cấu trúc kết quả trả về (`ChoiceResponse`)
+### Response Schema (`ChoiceResponse`)
 ```json
 {
   "type": "choice",
@@ -35,126 +35,127 @@ Sử dụng khi bạn cần phân loại nội dung hoặc chọn **duy nhất 1
   "confidence": 0.912
 }
 ```
-- `choice`: Khóa (key) của phương án có xác suất cao nhất.
-- `probabilities`: Bảng phân phối xác suất được chuẩn hóa (tổng bằng 1.0) cho mọi phương án.
-- `confidence`: Độ tin cậy nhận thức của mô hình đối với lựa chọn này (từ $0.0$ đến $1.0$).
+- `choice`: Key of the option with the highest calibrated probability.
+- `probabilities`: Normalized probability distribution (sums to 1.0) across all provided options.
+- `confidence`: Epistemic certainty metric regarding this evaluation ($0.0$ to $1.0$).
 
-### Best Practices cho `Choice`
-1. **Luôn có phương án thoát hiểm (Escape Hatch)**: Khi phân loại đầu vào tự do của người dùng, nên thêm một key như `other` hoặc `none_of_the_above` để mô hình không bị ép gán nhầm vào các danh mục cụ thể.
-2. **Criteria rõ ràng**: Thay vì chỉ đặt key ngắn (`billing`), hãy cung cấp mô tả ngắn gọn nhưng súc tích (`"Thanh toán, hóa đơn, hoặc gói cước định kỳ"`).
+### Best Practices for `Choice`
+1. **Always Include an Escape Hatch**: When classifying open-ended human text, include an option such as `other` or `none_of_the_above` to prevent forced misclassification.
+2. **Explicit Criteria Descriptions**: Rather than brief keys (`billing`), provide crisp contextual descriptions (`"Invoices, subscription upgrades, charges, or refund disputes"`).
+3. **Choice Set Cardinality**: Keep candidate spaces $\le 20$ when executing on-device with Laya-MLX. For candidate sets between 20 and 50, escalate to TypeSafe JEV Cloud or group candidates hierarchically.
 
 ---
 
-## 2. `Score` (Đánh Giá Theo Bậc Thang Thứ Tự)
+## 2. `Score` (Ordinal Progression & Continuous Scale)
 
-### Mục đích
-Được sử dụng để đánh giá hoặc xếp hạng một khía cạnh trên **thang đo có thứ tự (ordered levels)**, từ thấp đến cao (ví dụ: mức độ phẫn nộ, mức độ uy tín, chất lượng nội dung, độ phức tạp kỹ thuật).
+### Purpose
+Used to evaluate an attribute along an **ordered scale of levels**, from lowest to highest (e.g., urgency intensity, code quality, risk severity, technical complexity).
 
-### Cấu trúc câu hỏi
+### Question Schema
 ```json
 {
   "type": "score",
-  "instructions": "Đánh giá mức độ phẫn nộ của khách hàng",
+  "instructions": "Evaluate customer dissatisfaction intensity",
   "criteria": [
-    "Bình tĩnh, chỉ trình bày sự việc khách quan",
-    "Khó chịu nhưng vẫn giữ lịch sự",
-    "Rất tức giận, dùng từ ngữ công kích, đe dọa rời bỏ dịch vụ"
+    "Calm and purely factual description of events",
+    "Annoyed or frustrated but remains polite",
+    "Extremely hostile, abusive language, or threatening cancellation"
   ]
 }
 ```
-*Lưu ý: `criteria` là một mảng (Array). Chỉ số index `0`, `1`, `2` tương ứng với các bậc điểm từ thấp đến cao.*
+*Note: `criteria` is an array. Index `0`, `1`, `2` represents ordinal progression from lowest to highest.*
 
-### Cấu trúc kết quả trả về (`ScoreResponse`)
+### Response Schema (`ScoreResponse`)
 ```json
 {
   "type": "score",
   "score": 1.74,
   "legend": {
-    "0": "Bình tĩnh, chỉ trình bày sự việc khách quan",
-    "1": "Khó chịu nhưng vẫn giữ lịch sự",
-    "2": "Rất tức giận, dùng từ ngữ công kích, đe dọa rời bỏ dịch vụ"
+    "0": "Calm and purely factual description of events",
+    "1": "Annoyed or frustrated but remains polite",
+    "2": "Extremely hostile, abusive language, or threatening cancellation"
   },
   "confidence": 0.885
 }
 ```
-- `score`: Điểm số dạng số thực liên tục (continuous float), ví dụ $1.74$ nằm giữa mức 1 và mức 2. Điểm này được tính toán kỳ vọng toán học dựa trên phân phối xác suất qua các bậc!
-- `confidence`: Mức độ chắc chắn của mô hình về điểm số đã cho.
+- `score`: Continuous float (e.g., $1.74$ sits between level 1 and level 2). Calculated as the mathematical expectation over the level probability distribution.
+- `confidence`: Epistemic certainty regarding the calculated score.
 
-### Ưu điểm vượt trội của `Score`
-Khác với việc yêu cầu LLM "hãy chấm điểm từ 1 đến 10" (thường sinh số ngẫu nhiên hoặc thiên lệch về 7-8), `Score` của Jev dựa trên mô tả các mốc cụ thể và tính toán kỳ vọng toán học chính xác từ xác suất qua từng mốc.
+### Superiority over Generative Prompting
+Unlike prompting an LLM to "rate this from 1 to 10" (which produces severe clustering around 7–8 and poor calibration), `Score` anchors evaluation to explicit benchmark descriptions and computes mathematical expectation directly from logits.
 
 ---
 
-## 3. `Noul` (Đánh Giá Nhị Phân / Xác Suất Yes-No)
+## 3. `Noul` (Binary Probability / Proposition Evaluation)
 
-### Mục đích
-`Noul` (tên gọi bắt nguồn từ Boolean/Null-One) kiểm tra xem **một tiêu chí hoặc mệnh đề cụ thể có đúng hay không**. Kết quả trả về là xác suất chuẩn hóa $P(\text{Yes})$.
+### Purpose
+`Noul` (derived from Boolean Null-One) tests whether **a specific condition or predicate is true**. It returns the calibrated probability $P(\text{Yes})$.
 
-### Cấu trúc câu hỏi
+### Question Schema
 ```json
 {
   "type": "noul",
-  "instructions": "Văn bản này có chứa yêu cầu khẩn cấp không?"
+  "instructions": "Does this text contain an urgent or time-sensitive request?"
 }
 ```
 
-### Cấu trúc kết quả trả về (`NoulResponse`)
+### Response Schema (`NoulResponse`)
 ```json
 {
   "type": "noul",
   "noul": 0.965,
-  "confidence": 0.94
+  "confidence": 0.940
 }
 ```
-- `noul`: Xác suất từ $0.0$ đến $1.0$ rằng câu trả lời là **YES** (Thỏa mãn tiêu chí).
-- `confidence`: Mức độ tự tin của mô hình vào việc đưa ra xác suất này.
+- `noul`: Calibrated probability from $0.0$ to $1.0$ that the statement is **YES** (satisfies the condition).
+- `confidence`: Model certainty regarding the evidence sufficiency.
 
-### Khi nào dùng `Noul` thay vì `Choice`?
-- Dùng `Noul` khi câu hỏi mang tính độc lập: "Có chứa thông tin nhạy cảm không?", "Có cần phê duyệt bởi quản lý không?".
-- Nếu bạn có 5 tiêu chí độc lập nhau (ví dụ một email có thể vừa "khẩn cấp", vừa "có lỗi kỹ thuật", vừa "chứa link lạ"), hãy dùng 5 câu hỏi `Noul` thay vì 1 câu `Choice`!
+### When to Use `Noul` vs `Choice`
+- Use `Noul` for independent, non-mutually exclusive propositions: "Contains PII?", "Requires admin authorization?", "Contains SQL injection characters?".
+- If an entity possesses multiple orthogonal attributes, query multiple `Noul` primitives simultaneously rather than trying to construct an explosive permutation of `Choice` combinations.
 
 ---
 
-## 4. Cơ Chế Batching: Hỏi Nhiều Câu Trong 1 Lần Gọi
+## 4. Multi-Question Batching
 
-Điểm mạnh độc nhất của Jev là bạn có thể gửi kèm **hàng chục câu hỏi khác nhau** (hỗn hợp Choice, Score, Noul) trong cùng một request với cùng một `state`.
+A key architectural advantage of System 1 is that you can evaluate **dozens of heterogeneous questions** (mixing Choice, Score, and Noul) in a single invocation against the same `state`.
 
 ```json
 {
-  "state": "Tôi mua gói Pro ngày hôm qua nhưng tài khoản vẫn báo là Free. Yêu cầu hoàn tiền ngay lập tức nếu không kích hoạt trong 1 giờ tới!",
+  "state": "I purchased the Pro plan yesterday but my account still displays Free. Grant access immediately or issue a full refund within 1 hour!",
   "model": "jev-latest",
   "questions": {
     "intent": {
       "type": "choice",
-      "instructions": "Phân loại mục đích của ticket",
+      "instructions": "Classify the primary ticket intent",
       "criteria": {
-        "upgrade_issue": "Lỗi nâng cấp gói dịch vụ",
-        "refund_request": "Yêu cầu hoàn tiền",
-        "feature_inquiry": "Hỏi thông tin tính năng"
+        "upgrade_issue": "Subscription upgrade or license synchronization issue",
+        "refund_request": "Explicit request for payment return",
+        "feature_inquiry": "Product capability question"
       }
     },
     "customer_sentiment": {
       "type": "score",
-      "instructions": "Tâm trạng khách hàng",
+      "instructions": "Customer emotional intensity",
       "criteria": [
-        "Tích cực hoặc bình thường",
-        "Thất vọng nhẹ",
-        "Cực kỳ gay gắt và đe dọa"
+        "Positive or normal factual tone",
+        "Mild frustration or disappointment",
+        "Extremely aggressive, hostile, or threatening"
       ]
     },
     "churn_risk": {
       "type": "noul",
-      "instructions": "Khách hàng có nguy cơ rời bỏ dịch vụ hoặc hủy thanh toán không?"
+      "instructions": "Is the user threatening cancellation or chargeback?"
     },
     "urgent_sla": {
       "type": "noul",
-      "instructions": "Nội dung có đặt thời hạn xử lý ngắn hoặc khẩn cấp không?"
+      "instructions": "Does the request impose an explicit tight deadline (< 2 hours)?"
     }
   }
 }
 ```
 
-### Lợi ích của Batching
-1. **Chỉ truyền State một lần**: Giảm tải băng thông và chi phí token đầu vào.
-2. **Độ trễ tương đương 1 câu hỏi**: Jev xử lý song song các câu hỏi trên biểu diễn ngữ nghĩa của `state`.
-3. **Tiết kiệm tới 90% chi phí**: Thay vì phải gọi 4 lần LLM hoặc viết 4 prompt riêng biệt.
+### Advantages of Batching
+1. **Single State Transmission**: Context is tokenized and embedded once, drastically reducing network overhead.
+2. **Sub-15ms Local Parallel Evaluation**: Laya-MLX evaluates batch question heads in parallel across Unified Memory.
+3. **90% Cost Reduction**: Eliminates multiple round-trip generative LLM queries.

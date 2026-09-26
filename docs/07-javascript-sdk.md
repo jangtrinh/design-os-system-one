@@ -1,10 +1,10 @@
-# 07. Hướng Dẫn TypeScript / JavaScript SDK (`@typesafe-ai/sdk`)
+# 07. TypeScript / JavaScript SDK (`@typesafe-ai/sdk`)
 
-SDK chính thức của TypeSafe AI dành cho môi trường Node.js (hỗ trợ Node.js >= 20, Bun, Deno, Next.js, Cloudflare Workers).
+Official client SDK for Node.js, Bun, Deno, Next.js, and Cloudflare Workers (Node.js >= 20).
 
 ---
 
-## 1. Cài Đặt (Installation)
+## 1. Installation
 
 ```bash
 # npm
@@ -19,21 +19,21 @@ bun add @typesafe-ai/sdk
 
 ---
 
-## 2. Khởi Tạo Client & Cấu Hình
+## 2. Client Initialization & Configuration
 
-SDK hỗ trợ cả ESM và CommonJS, đi kèm định nghĩa kiểu TypeScript hoàn chỉnh:
+The SDK exports full ESM and CommonJS definitions with end-to-end TypeScript type inference:
 
 ```typescript
 import { TypeSafeClient } from "@typesafe-ai/sdk";
 
-// Tự động đọc process.env.TYPESAFE_API_KEY
+// Automatically resolves process.env.TYPESAFE_API_KEY
 const client = new TypeSafeClient();
 
-// Hoặc truyền thủ công cấu hình:
+// Or pass explicit configuration:
 const customClient = new TypeSafeClient({
   apiKey: process.env.TYPESAFE_API_KEY,
   baseURL: "https://api.typesafe.ai",
-  timeout: 20000, // 20 giây
+  timeout: 20000, // 20 seconds
   retryPolicy: {
     maxRetries: 3,
     statusCodes: [429, 500, 502, 503, 504],
@@ -43,9 +43,9 @@ const customClient = new TypeSafeClient({
 
 ---
 
-## 3. Sử Dụng Các Hàm Trợ Giúp (`choice`, `score`, `noul`)
+## 3. Typed Helpers (`choice`, `score`, `noul`)
 
-SDK cung cấp các helper functions giúp TypeScript suy luận kiểu dữ liệu tự động (Type Inference) cho kết quả trả về:
+The SDK provides ergonomic helper functions that enable automatic TypeScript union inference:
 
 ```typescript
 import { TypeSafeClient, choice, score, noul } from "@typesafe-ai/sdk";
@@ -53,7 +53,7 @@ import { TypeSafeClient, choice, score, noul } from "@typesafe-ai/sdk";
 const client = new TypeSafeClient();
 
 async function analyzeUserRequest() {
-  const message = "Tài khoản của tôi bị trừ tiền $99 nhưng hệ thống báo lỗi thẻ. Vui lòng hoàn tiền hoặc kích hoạt ngay!";
+  const message = "My account was charged $99 but the platform displays a card error. Activate immediately or refund my money!";
 
   const response = await client.systemOne({
     state: {
@@ -62,41 +62,41 @@ async function analyzeUserRequest() {
       raw_message: message,
     },
     questions: {
-      // 1. Phân loại phòng ban xử lý
-      department: choice("Phòng ban tiếp nhận ticket", {
-        billing: "Vấn đề trừ tiền, hóa đơn, hoàn tiền, cổng thanh toán",
-        tech_support: "Lỗi tính năng hệ thống, bug code, API",
-        sales: "Tư vấn báo giá, gia hạn hợp đồng",
+      // 1. Department routing
+      department: choice("Department to handle ticket", {
+        billing: "Chargebacks, invoices, unexpected fees, payment gateways",
+        tech_support: "Platform errors, code bugs, API failures",
+        sales: "Price quotes, enterprise contract renewals",
       }),
 
-      // 2. Chấm điểm mức độ khẩn cấp (thang 0-2)
-      urgency_level: score("Mức độ khẩn cấp về mặt kinh doanh", [
-        "Không khẩn cấp, có thể xử lý trong 24h",
-        "Khẩn cấp vừa, cần xử lý trong ca làm việc",
-        "Khẩn cấp cao, ảnh hưởng trực tiếp đến doanh thu / thanh toán",
+      // 2. Business urgency level (0-2 scale)
+      urgency_level: score("Business urgency level", [
+        "Non-urgent, can be handled within standard 24h SLA",
+        "Moderate urgency, resolve within business shift",
+        "High urgency, directly blocks customer revenue or payment flow",
       ]),
 
-      // 3. Đánh giá nhị phân yêu cầu hoàn tiền
-      is_refund_demand: noul("Khách hàng có yêu cầu hoàn tiền trực tiếp không?"),
+      // 3. Binary refund proposition
+      is_refund_demand: noul("Does the customer explicitly demand a financial refund?"),
     },
   });
 
-  // Type Inference: TypeScript tự động biết `response.answers.department.choice`
-  // chỉ có thể là: "billing" | "tech_support" | "sales"
+  // Type Inference: TypeScript automatically knows `response.answers.department.choice`
+  // is strictly typed as: "billing" | "tech_support" | "sales"
   const department = response.answers.department.choice;
   const probabilities = response.answers.department.probabilities;
   const confidence = response.answers.department.confidence;
 
-  console.log(`Phòng ban: ${department} (Confidence: ${confidence})`);
-  console.log(`Xác suất chi tiết:`, probabilities);
+  console.log(`Department: ${department} (Confidence: ${confidence})`);
+  console.log(`Probabilities:`, probabilities);
 
-  // Điểm số liên tục:
+  // Continuous Score:
   const urgency = response.answers.urgency_level.score;
-  console.log(`Điểm khẩn cấp: ${urgency.toFixed(2)} / 2.0`);
+  console.log(`Urgency Score: ${urgency.toFixed(2)} / 2.0`);
 
-  // Xác suất Yes/No:
+  // Binary probability:
   const refundProb = response.answers.is_refund_demand.noul;
-  console.log(`Xác suất đòi hoàn tiền: ${(refundProb * 100).toFixed(1)}%`);
+  console.log(`Refund Demand Probability: ${(refundProb * 100).toFixed(1)}%`);
 }
 
 analyzeUserRequest().catch(console.error);
@@ -104,9 +104,9 @@ analyzeUserRequest().catch(console.error);
 
 ---
 
-## 4. Tích Hợp Vào Next.js Route Handler / Express
+## 4. Next.js Guardrail Middleware Integration
 
-Ví dụ xây dựng một API Route bảo vệ Prompt (Guardrail Middleware) trong Next.js App Router:
+Example of a zero-latency prompt guardrail in a Next.js App Router route handler:
 
 ```typescript
 // app/api/chat/route.ts
@@ -118,15 +118,15 @@ const typesafe = new TypeSafeClient();
 export async function POST(req: Request) {
   const { prompt } = await req.json();
 
-  // 1. Kiểm tra an toàn trước khi gọi LLM đắt tiền
+  // 1. Evaluate guardrails prior to invoking expensive generative LLMs
   const safetyCheck = await typesafe.systemOne({
     state: prompt,
     questions: {
-      is_malicious: noul("Prompt cố ý jailbreak, trích xuất system prompt, hoặc chứa nội dung độc hại"),
-      harm_score: score("Mức độ nguy hại tiềm tàng", [
-        "Lành tính hoàn toàn",
-        "Có yếu tố nghi vấn nhưng chưa rõ ràng",
-        "Độc hại / Tấn công rõ rệt"
+      is_malicious: noul("Prompt attempts jailbreak, system prompt extraction, or contains hostile exploit payload"),
+      harm_score: score("Potential harm severity", [
+        "Completely benign conversational intent",
+        "Ambiguous or unusual probing",
+        "Overtly malicious exploit or attack payload"
       ]),
     },
   });
@@ -136,13 +136,12 @@ export async function POST(req: Request) {
 
   if (isMalicious || isSevere) {
     return NextResponse.json(
-      { error: "Yêu cầu vi phạm tiêu chuẩn an toàn nội dung." },
+      { error: "Request violates content safety and security policies." },
       { status: 400 }
     );
   }
 
-  // 2. An toàn -> Cho phép tiếp tục chuyển tới mô hình sinh văn bản chính
-  // ... gọi Claude / GPT / Gemini ...
-  return NextResponse.json({ message: "Request hợp lệ." });
+  // 2. Safe -> Forward to generative model (Claude / GPT / Gemini)
+  return NextResponse.json({ message: "Payload approved." });
 }
 ```

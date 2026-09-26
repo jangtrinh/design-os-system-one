@@ -1,69 +1,70 @@
-# 01. Triết Lý Mô Hình System One (System One Concept)
+# 01. System One Philosophy & Architecture
 
-## 1. Khái Niệm System One vs System Two
+## 1. System One vs System Two Cognitive Paradigms
 
-Khái niệm "System 1" và "System 2" xuất phát từ lý thuyết nhận thức của Daniel Kahneman (*Thinking, Fast and Slow*):
-- **System 1 (Hệ Thống 1)**: Nhanh, tự động, tiềm thức, trực giác nhận diện mẫu (pattern recognition), tốn ít năng lượng. Ví dụ: nhận ra một khuôn mặt quen thuộc, đọc một biển báo trên đường, cảm nhận tông giọng giận dữ.
-- **System 2 (Hệ Thống 2)**: Chậm, tuần tự, suy luận logic có ý thức, tốn nhiều năng lượng tính toán. Ví dụ: giải bài toán $17 \times 24$, viết luận điểm triết học, lập kế hoạch dự án.
+The distinction between "System 1" and "System 2" originates from Daniel Kahneman's cognitive theory (*Thinking, Fast and Slow*):
+- **System 1**: Fast, automatic, subconscious pattern recognition, minimal computational energy. Examples: recognizing a familiar face, reading a traffic sign, sensing irritation in a caller's voice.
+- **System 2**: Slow, sequential, deliberative logical reasoning, high computational cost. Examples: calculating $17 \times 24$, formulating a philosophical thesis, complex multi-stage project planning.
 
 ```mermaid
 graph TD
-    subgraph "Hệ Thống AI Truyền Thống (System Two)"
-        LLM[Large Language Models: GPT-4, Claude, Gemini] -->|Sinh chuỗi tokens| TextOut[Văn bản tự do / Giải thích dài dòng]
-        TextOut -->|Regex / JSON Parser| CodeParser[Cần tầng phân tích cú pháp]
-        CodeParser -->|Dễ lỗi schema / Hallucination| Logic[Phần mềm rẽ nhánh]
+    subgraph "Legacy Generative AI (System Two)"
+        LLM[Large Language Models: GPT-4, Claude, Gemini] -->|Streams prose / markdown tokens| TextOut[Verbose Explanations & Text]
+        TextOut -->|Regex / JSON Parser| CodeParser[Fragile Extraction Layer]
+        CodeParser -->|Schema Errors & Hallucinations| Logic[Application Conditional Logic]
     end
 
-    subgraph "Hệ Thống TypeSafe AI (System One)"
-        State[Trạng thái ứng dụng: State] --> JEV[Jev Model: System One]
-        Questions[Câu hỏi định kiểu: Choice / Score / Noul] --> JEV
-        JEV -->|Trả thẳng typed data + probabilities| DirectCode[Code trực tiếp if/else mà không cần parse]
+    subgraph "TypeSafe System One Architecture"
+        State[Application Context: State] --> JEV[System One Model: Laya / JEV]
+        Questions[Typed Questions: Choice / Score / Noul] --> JEV
+        JEV -->|Direct typed data + calibrated probabilities| DirectCode[Deterministic if/else branches]
     end
 ```
 
-### Tại sao phần mềm hiện đại cần System One?
-Hầu hết các tác vụ trong ứng dụng không cần một mô hình ngôn ngữ khổng lồ ngồi "viết văn". Chúng chỉ cần một quyết định dứt khoát:
-- "Email này thuộc phòng ban nào?" (Support, Billing, Sales)
-- "Nội dung này có chứa dấu hiệu lừa đảo không?" (Yes / No)
-- "Mức độ phẫn nộ của khách hàng là bao nhiêu trên thang 1-5?"
-- "Câu trích dẫn này có đúng với văn bản gốc không?"
+### Why Modern Software Demands System One
 
-Nếu dùng LLM thông thường cho các tác vụ này:
-1. **Độ trễ cao**: Phải chờ mô hình sinh hàng chục đến hàng trăm token (tốn từ 1 đến 5 giây).
-2. **Chi phí đắt đỏ**: Trả tiền cho việc sinh các từ nối và giải thích không cần thiết.
-3. **Kém tin cậy**: LLM có thể trả về JSON sai cú pháp, thêm lời xin lỗi, hoặc bị hallucinate.
-4. **Không có xác suất chuẩn hóa (Uncalibrated)**: Khi LLM trả lời "Có", bạn không biết chắc nó chắc chắn 99% hay chỉ đoán mò 51%.
+The vast majority of software execution branches do not require an LLM to generate creative essays. They simply require a fast, deterministic judgment:
+- "Which department should handle this ticket?" (`support`, `billing`, `sales`)
+- "Does this payload contain signs of social engineering or fraud?" (Yes / No)
+- "What is the customer's sentiment intensity on a 0–2 scale?"
+- "Is this search context relevant to the incoming user query?"
 
----
-
-## 2. Jev — Mô Hình System One Đầu Tiên
-
-**Jev** là mô hình nền tảng đầu tiên được TypeSafe AI huấn luyện chuyên biệt theo trường phái System One:
-- **Không sinh văn bản tự do**: Jev không sinh chữ nối chữ. Jev đọc trạng thái và đánh giá trực tiếp trên các câu hỏi được định kiểu.
-- **Đầu ra có cấu trúc (Strictly Structured)**: Kết quả trả về map trực tiếp với các kiểu dữ liệu của ngôn ngữ lập trình (TypeScript Types / Python Pydantic models).
-- **Xác suất chuẩn hóa (Calibrated Probabilities)**: Nếu Jev trả về xác suất $0.85$ cho một nhãn, điều đó có nghĩa trong 100 lần Jev dự đoán $0.85$, đúng $85$ lần trường hợp đó là chính xác.
-- **Độ tin cậy nhận thức (Confidence Score)**: Jev cung cấp một trục độc lập: không chỉ mức độ thiên lệch (`probability`), mà còn mức độ tự tin vào dữ liệu hiện có (`confidence`).
+Using standard generative LLMs for these operations introduces four major failure modes:
+1. **Excessive Latency**: Awaiting token-by-token generation incurs a 1,000ms to 5,000ms penalty per step.
+2. **Punitive Costs**: You pay for preamble words, markdown fluff, and unnecessary explanations.
+3. **Fragile Schemas**: Generative models frequently hallucinate field names, emit broken JSON syntax, or insert unrequested disclaimers.
+4. **Uncalibrated Confidence**: When an LLM outputs "Yes", the caller cannot determine whether it is 99% certain or guessing at 51%.
 
 ---
 
-## 3. Triết Lý "Code In Control" (Code Làm Chủ)
+## 2. Jev & Laya: Purpose-Built System One Engines
 
-Một sai lầm phổ biến khi tích hợp AI vào phần mềm là trao toàn bộ quyền kiểm soát luồng (control flow) cho AI Agent. Điều này dẫn đến sự mất kiểm soát, chi phí không đoán trước, và lỗi logic khó debug.
+**Jev** (cloud-scale triage) and **Laya-MLX** (local on-device inference) are foundation models built specifically for software:
+- **Zero Prose Generation**: They do not emit free-form text. They ingest arbitrary state and evaluate directly against typed questions.
+- **Strictly Typed Outputs**: Responses map 1:1 with programming language types (TypeScript schemas, Python Pydantic models).
+- **Calibrated Probabilities**: If the engine outputs a probability of $0.85$ for a label, empirical observation verifies that in 85 out of 100 cases, the prediction is factually correct.
+- **Epistemic Confidence Scores**: Provides an independent dimension distinguishing probability distribution (`probability`) from epistemic certainty based on context completeness (`confidence`).
 
-Với Jev, quy tắc thiết kế bất biến là: **Code luôn nắm quyền điều khiển**.
+---
 
-| Thành Phần | Trách Nhiệm Của Code | Trách Nhiệm Của Jev |
+## 3. The "Code in Control" Principle
+
+A common anti-pattern in agentic engineering is delegating the entire runtime control flow to an autonomous model. This inevitably leads to runaways, unpredictable cloud bills, and nondeterministic bugs.
+
+Under `design-os-system-one`, the governing invariant is: **Code always retains control.**
+
+| System Component | Code Responsibility | System One Model Responsibility |
 | :--- | :--- | :--- |
-| **Logic nghiệp vụ** | Nắm giữ 100% logic kinh doanh, tính toán số học, điều kiện rẽ nhánh | Cung cấp nhận định ngữ nghĩa tại các điểm phân nhánh |
-| **Dữ liệu & State** | Truy vấn DB, xác thực schema, lọc dữ liệu sạch | Đọc và thấu hiểu ngữ cảnh tự nhiên trong dữ liệu |
-| **Hành động (Side-effects)** | Gửi email, ghi log, kích hoạt transaction, gọi API thanh toán | **Không bao giờ** tự ý thực hiện hành động |
-| **Xử lý rủi ro** | Đặt ngưỡng tin cậy (threshold), chuyển con người review | Báo cáo chính xác độ tin cậy và xác suất |
+| **Business Logic** | 100% of business logic, numeric computation, and conditional branches | Provides semantic evaluations at specific decision gates |
+| **Data & State** | Database queries, schema validation, data sanitization | Ingests and interprets natural language context |
+| **Side Effects (Mutations)** | Sends emails, writes transactions, executes payments | **Never** allowed to trigger side effects directly |
+| **Risk & Fallback** | Enforces confidence thresholds, triggers human escalation | Reports mathematically calibrated probabilities and confidence |
 
 ---
 
-## 4. So Sánh Hiệu Năng & Chi Phí (Benchmarks Thực Tế)
+## 4. Performance & Cost Benchmarks
 
-Theo kiểm thử chính thức từ TypeSafe AI (được chứng minh qua các Cookbook như *Parallel Questions*):
-- **Tốc độ**: Batching các câu hỏi trên Jev nhanh hơn **10.0x** so với gọi LLM tương đương.
-- **Chi phí**: Rẻ hơn **12.2x** cho cùng một bộ câu hỏi đánh giá ngữ nghĩa.
-- **Tính nhất quán (Deterministic Structure)**: Cấu trúc JSON trả về luôn tuân thủ 100% hợp đồng API, triệt tiêu hoàn toàn rủi ro lỗi cú pháp (JSON parse error).
+Empirical benchmarking confirms:
+- **Throughput**: Batching typed questions against System One is **10.0x faster** than prompting an equivalent LLM.
+- **Cost**: **12.2x cheaper** in cloud APIs, and **100% free ($0.00)** when resolved locally via Laya-MLX.
+- **Deterministic Schema**: Returned JSON strictly adheres to the schema contract, eliminating JSON parsing errors entirely.

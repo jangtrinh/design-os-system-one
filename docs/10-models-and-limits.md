@@ -1,44 +1,46 @@
-# 10. Thông Số Model & Các Góc Cạnh Chưa Hoàn Hảo (Models & Jaggedness)
+# 10. Operational Specs & Jagged Edge Catalog
 
-Để xây dựng hệ thống phần mềm đáng tin cậy với Jev, bạn cần hiểu rõ đặc tính kỹ thuật, giới hạn, và những "góc cạnh chưa hoàn hảo" (Jagged Edges) đã được TypeSafe AI ghi nhận chính thức.
+To build resilient, deterministic systems, engineers must understand the exact operational boundaries, latency ceilings, and documented "jagged edges" of the underlying models.
 
 ---
 
-## 1. Danh Sách Mô Hình (Model Roster)
+## 1. Model Roster
 
-| Tên Model | Định Danh | Mục Đích Sử Dụng | Khuyến Nghị |
+| Model Tag | Identifier | Intended Use | Deployment Recommendation |
 | :--- | :--- | :--- | :--- |
-| **`jev-latest`** | Tự động trỏ tới bản mới nhất | Luôn nhận các cải tiến và bản vá mới nhất | Phù hợp cho môi trường Dev/Staging |
-| **`jev-1.13`** | Phiên bản cố định (Version-pinned) | Giữ hành vi và phân phối xác suất bất biến | Bắt buộc cho môi trường Production ổn định |
+| **`laya-mlx`** | Local Edge (Apple Silicon) | On-device sub-10ms System 1 inference (MPS / MLX Metal Graph) | Primary local engine for macOS workstations ($0 cost) |
+| **`jev-latest`** | Cloud API (Rolling) | Evaluates latest patches and taxonomy updates | Recommended for Dev / Staging environments |
+| **`jev-1.13`** | Cloud API (Pinned) | Guarantees immutable probability distributions and behavior | Required for production compliance and regulated pipelines |
 
 ---
 
-## 2. Thông Số Vận Hành (Operational Specs)
+## 2. Operational Specifications
 
-- **Độ trễ trung bình (P50 Latency)**: $30\text{ms} - 120\text{ms}$ (tùy thuộc vào độ dài của `state` và số lượng câu hỏi batching).
-- **Giới hạn Context Token**:
-  - Tối đa khoảng $8.000$ tokens cho `state`.
-  - Khuyến nghị tối ưu: $50 - 4.000$ tokens để đạt độ chuẩn hóa xác suất cao nhất.
-- **Số lượng câu hỏi tối đa trong một Request**: Lên tới hàng chục câu hỏi (khuyến nghị $\le 30$ câu hỏi cho một lượt đánh giá để giữ độ trễ thấp).
+- **Latency Profile (P50)**: 
+  - Local Edge (Laya-MLX): **6.53 ms**
+  - Cloud API (TypeSafe JEV): **796.8 ms**
+  - Cascade Router ($\tau = 0.30$): **243.2 ms** (3.41x speedup over pure cloud)
+- **Context Token Budgets**:
+  - Maximum context: ~8,192 tokens.
+  - Recommended context: 50 – 4,000 tokens for optimal calibration.
+- **Batching Capacity**: Scales cleanly across dozens of questions per request ($\le 30$ recommended per single forward pass).
 
 ---
 
-## 3. Các Góc Cạnh Chưa Hoàn Hảo Của Jev 1.13 (Known Jagged Edges)
+## 3. Documented Jagged Edges & Remediation
 
-Tài liệu chính thức từ TypeSafe AI ghi nhận một số hành vi cần lưu ý khi thiết kế câu hỏi cho `jev-1.13`:
+### A. Double Negatives in Question Phrasing
+- ⚠️ **Symptom**: Using double negatives in `Noul` or `Choice` criteria (e.g., *"This text does not contain content that is not in English"*) degrades probability calibration.
+- ✅ **Remediation**: Always formulate questions affirmatively: *"This text is written entirely in English"*.
 
-### A. Câu Hỏi Phủ Định Kép (Double Negatives)
-- ⚠️ **Hiện tượng**: Khi câu hỏi `Noul` hoặc tiêu chí `Choice` sử dụng phủ định kép (ví dụ: *"Văn bản này không chứa nội dung nào không phải là tiếng Anh"*), mô hình có thể bị giảm độ chuẩn xác.
-- ✅ **Khắc phục**: Luôn viết câu hỏi ở thể khẳng định trực tiếp: *"Văn bản này được viết hoàn toàn bằng tiếng Anh"*.
+### B. Over-Granular `Score` Criteria
+- ⚠️ **Symptom**: Supplying 10 to 20 granular levels in a `Score` prompt dilutes the probability mass across adjacent buckets, inflating entropy.
+- ✅ **Remediation**: Maintain **3 to 5 well-defined milestone levels** (e.g., `Low`, `Medium`, `High`, or `0: None`, `1: Moderate`, `2: Critical`). The engine computes continuous expectation (e.g., $1.42$) with mathematical precision.
 
-### B. Thang Điểm `Score` Quá Dày (Over-Granular Levels)
-- ⚠️ **Hiện tượng**: Đưa vào 10 hoặc 20 bậc cho câu hỏi `Score` (ví dụ từ 1 đến 10) thường khiến xác suất bị dàn trải đều (high entropy), làm giảm độ phân định rõ rệt.
-- ✅ **Khắc phục**: Giữ thang `Score` từ **3 đến 5 mức mô tả rõ ràng** (ví dụ: `Thấp`, `Trung bình`, `Cao`, hoặc `0: Không`, `1: Nhẹ`, `2: Nghiêm trọng`). Jev sẽ nội suy ra điểm số thực liên tục (ví dụ: $1.42$) cực kỳ chính xác!
+### C. Unlabeled Tabular Data
+- ⚠️ **Symptom**: Ingesting raw CSV rows without header rows forces the model to guess column relationships.
+- ✅ **Remediation**: Serialize tables as arrays of structured JSON objects or valid Markdown tables with explicit column headers.
 
-### C. Dữ Liệu Bảng (Tables) Thiếu Tiêu Đề
-- ⚠️ **Hiện tượng**: Đưa vào văn bản dạng CSV hoặc bảng không có tiêu đề cột rõ ràng khiến mô hình mất nhiều token để suy đoán ý nghĩa từng cột.
-- ✅ **Khắc phục**: Chuyển đổi bảng thành danh sách JSON objects hoặc Markdown Table có dòng Header chuẩn.
-
-### D. Tiêu Chí Choice Bị Chồng Lấn (Overlapping Options)
-- ⚠️ **Hiện tượng**: Các options trong `Choice` có ranh giới ngữ nghĩa quá mờ nhạt (ví dụ: Option A: "Lỗi thanh toán", Option B: "Lỗi ngân hàng").
-- ✅ **Khắc phục**: Làm rõ ranh giới: Option A: "Lỗi do cổng thanh toán Stripe / thẻ tín dụng", Option B: "Chuyển khoản trực tiếp qua tài khoản ngân hàng".
+### D. Overlapping Semantic Boundaries in `Choice`
+- ⚠️ **Symptom**: Options with ambiguous overlap (e.g., Option A: "Billing defect", Option B: "Banking issue").
+- ✅ **Remediation**: Formulate mutually exclusive boundaries: Option A: "Card processor / Stripe gateway error", Option B: "Direct wire transfer or ACH routing issue".

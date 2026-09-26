@@ -3,13 +3,13 @@
 # index.html is a hand-built page (layout: null) sharing assets/site.css.
 # jekyll-seo-tag emits <title>, <meta name="description">, Open Graph and JSON-LD;
 # jekyll-sitemap emits sitemap.xml for Google Search Console.
-title: jev
-description: "TypeSafe JEV and Dual-Brain System 1: sub-10ms on-device decisions, 5-stage speculative commit engine, and 95% LLM cost reduction for autonomous agents."
+title: design-os-system-one
+description: "TypeSafe System 1 & Dual-Brain Architecture: sub-10ms on-device decisions, 5-stage speculative commit engine, and 95% LLM cost reduction for autonomous agents."
 url: https://jangtrinh.github.io
-baseurl: /jev
+baseurl: /design-os-system-one
 lang: en
-repository: jangtrinh/jev
-repository_url: https://github.com/jangtrinh/jev
+repository: jangtrinh/design-os-system-one
+repository_url: https://github.com/jangtrinh/design-os-system-one
 wordmark: JANGTRINH
 wordmark_url: https://github.com/jangtrinh
 eyebrow: AGENTIC SYSTEM 1 · DUAL-BRAIN ARCHITECTURE          # short product family label, e.g. design:os
@@ -21,9 +21,9 @@ nav:                        # one entry per Markdown page under docs/, in readin
   - { title: "API Reference", url: "/05-rest-api-reference.html" }
   - { title: "Recipes", url: "/09-cookbooks-and-recipes.html" }
 footer:
-  - { title: "GitHub", url: "https://github.com/jangtrinh/jev" }
-  - { title: "Case Study", url: "https://jangtrinh.github.io/jev/case-study.html" }
-  - { title: "MIT", url: "https://github.com/jangtrinh/jev/blob/main/LICENSE" }
+  - { title: "GitHub", url: "https://github.com/jangtrinh/design-os-system-one" }
+  - { title: "Case Study", url: "https://jangtrinh.github.io/design-os-system-one/case-study.html" }
+  - { title: "MIT", url: "https://github.com/jangtrinh/design-os-system-one/blob/main/LICENSE" }
 plugins:
   - jekyll-seo-tag
   - jekyll-sitemap

@@ -1,10 +1,13 @@
 {
-  "name": "jev-monorepo",
+  "name": "design-os-system-one",
   "version": "1.0.0",
   "private": true,
-  "description": "JEV (System One) Monorepo - ultra-fast browser automation, shared contract, and voice agent",
+  "description": "design-os-system-one: TypeSafe System 1 & Dual-Brain Architecture (Laya-MLX sub-10ms on-device + TypeSafe JEV cloud triage)",
   "scripts": {
     "build": "pnpm -r --filter \"./packages/**\" --filter \"./projects/**\" run build",
-    "test": "pnpm -r run test"
+    "test": "pnpm -r run test",
+    "setup:laya": "bash scripts/setup-laya.sh",
+    "bench:cascade": "python3 projects/laya-jev-lab/cascade/cascade.py",
+    "bench:mlx": "python3 packages/laya-mlx/run_comprehensive_benchmark.py"
   }
 }

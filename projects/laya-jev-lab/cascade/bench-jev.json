@@ -1,0 +1,642 @@
+[
+  {
+    "text": "重复扣款了，第二笔要退给我。",
+    "expect": "billing",
+    "diff": "清晰",
+    "choice": "billing",
+    "conf": 1,
+    "probs": {
+      "logistics": 0,
+      "billing": 1,
+      "sales": 0,
+      "tech": 0
+    },
+    "ok": true,
+    "ms": 1546,
+    "err": null
+  },
+  {
+    "text": "怎么开发票？",
+    "expect": "billing",
+    "diff": "清晰",
+    "choice": "billing",
+    "conf": 1,
+    "probs": {
+      "sales": 0,
+      "billing": 1,
+      "tech": 0,
+      "logistics": 0
+    },
+    "ok": true,
+    "ms": 1589,
+    "err": null
+  },
+  {
+    "text": "付款失败，提示卡片被拒。",
+    "expect": "billing",
+    "diff": "清晰",
+    "choice": "billing",
+    "conf": 1,
+    "probs": {
+      "tech": 0,
+      "billing": 1,
+      "sales": 0,
+      "logistics": 0
+    },
+    "ok": true,
+    "ms": 471,
+    "err": null
+  },
+  {
+    "text": "退款什么时候到账？",
+    "expect": "billing",
+    "diff": "清晰",
+    "choice": "billing",
+    "conf": 1,
+    "probs": {
+      "tech": 0,
+      "sales": 0,
+      "logistics": 0,
+      "billing": 1
+    },
+    "ok": true,
+    "ms": 507,
+    "err": null
+  },
+  {
+    "text": "发票抬头写错了要改。",
+    "expect": "billing",
+    "diff": "清晰",
+    "choice": "billing",
+    "conf": 1,
+    "probs": {
+      "sales": 0,
+      "tech": 0,
+      "logistics": 0,
+      "billing": 1
+    },
+    "ok": true,
+    "ms": 521,
+    "err": null
+  },
+  {
+    "text": "后台登录不上去。",
+    "expect": "tech",
+    "diff": "清晰",
+    "choice": "tech",
+    "conf": 1,
+    "probs": {
+      "logistics": 0,
+      "billing": 0,
+      "tech": 1,
+      "sales": 0
+    },
+    "ok": true,
+    "ms": 550,
+    "err": null
+  },
+  {
+    "text": "接口一直返回 500。",
+    "expect": "tech",
+    "diff": "清晰",
+    "choice": "tech",
+    "conf": 1,
+    "probs": {
+      "logistics": 0,
+      "sales": 0,
+      "billing": 0,
+      "tech": 1
+    },
+    "ok": true,
+    "ms": 498,
+    "err": null
+  },
+  {
+    "text": "页面白屏了，控制台报错。",
+    "expect": "tech",
+    "diff": "清晰",
+    "choice": "tech",
+    "conf": 1,
+    "probs": {
+      "logistics": 0,
+      "tech": 1,
+      "billing": 0,
+      "sales": 0
+    },
+    "ok": true,
+    "ms": 569,
+    "err": null
+  },
+  {
+    "text": "数据同步不过来，一直卡住。",
+    "expect": "tech",
+    "diff": "清晰",
+    "choice": "tech",
+    "conf": 1,
+    "probs": {
+      "tech": 1,
+      "sales": 0,
+      "logistics": 0,
+      "billing": 0
+    },
+    "ok": true,
+    "ms": 514,
+    "err": null
+  },
+  {
+    "text": "APP 闪退，安卓的。",
+    "expect": "tech",
+    "diff": "清晰",
+    "choice": "tech",
+    "conf": 1,
+    "probs": {
+      "sales": 0,
+      "logistics": 0,
+      "billing": 0,
+      "tech": 1
+    },
+    "ok": true,
+    "ms": 510,
+    "err": null
+  },
+  {
+    "text": "快递到哪了？",
+    "expect": "logistics",
+    "diff": "清晰",
+    "choice": "logistics",
+    "conf": 1,
+    "probs": {
+      "sales": 0,
+      "tech": 0,
+      "logistics": 1,
+      "billing": 0
+    },
+    "ok": true,
+    "ms": 1121,
+    "err": null
+  },
+  {
+    "text": "显示已发货但我没收到。",
+    "expect": "logistics",
+    "diff": "清晰",
+    "choice": "logistics",
+    "conf": 1,
+    "probs": {
+      "tech": 0,
+      "billing": 0,
+      "sales": 0,
+      "logistics": 1
+    },
+    "ok": true,
+    "ms": 459,
+    "err": null
+  },
+  {
+    "text": "什么时候能发货？",
+    "expect": "logistics",
+    "diff": "清晰",
+    "choice": "logistics",
+    "conf": 1,
+    "probs": {
+      "billing": 0,
+      "sales": 0,
+      "logistics": 1,
+      "tech": 0
+    },
+    "ok": true,
+    "ms": 501,
+    "err": null
+  },
+  {
+    "text": "物流三天没更新了。",
+    "expect": "logistics",
+    "diff": "清晰",
+    "choice": "logistics",
+    "conf": 1,
+    "probs": {
+      "logistics": 1,
+      "sales": 0,
+      "billing": 0,
+      "tech": 0
+    },
+    "ok": true,
+    "ms": 523,
+    "err": null
+  },
+  {
+    "text": "地址填错了能改吗？",
+    "expect": "logistics",
+    "diff": "清晰",
+    "choice": "logistics",
+    "conf": 1,
+    "probs": {
+      "tech": 0,
+      "billing": 0,
+      "sales": 0,
+      "logistics": 1
+    },
+    "ok": true,
+    "ms": 528,
+    "err": null
+  },
+  {
+    "text": "你们企业版多少钱？",
+    "expect": "sales",
+    "diff": "清晰",
+    "choice": "sales",
+    "conf": 0.99,
+    "probs": {
+      "logistics": 0,
+      "tech": 0,
+      "sales": 0.99,
+      "billing": 0.01
+    },
+    "ok": true,
+    "ms": 519,
+    "err": null
+  },
+  {
+    "text": "想预约一个产品演示。",
+    "expect": "sales",
+    "diff": "清晰",
+    "choice": "sales",
+    "conf": 1,
+    "probs": {
+      "billing": 0,
+      "logistics": 0,
+      "tech": 0,
+      "sales": 1
+    },
+    "ok": true,
+    "ms": 522,
+    "err": null
+  },
+  {
+    "text": "有没有大客户方案？",
+    "expect": "sales",
+    "diff": "清晰",
+    "choice": "sales",
+    "conf": 1,
+    "probs": {
+      "billing": 0,
+      "logistics": 0,
+      "tech": 0,
+      "sales": 1
+    },
+    "ok": true,
+    "ms": 526,
+    "err": null
+  },
+  {
+    "text": "能开个试用账号吗？",
+    "expect": "sales",
+    "diff": "清晰",
+    "choice": "sales",
+    "conf": 1,
+    "probs": {
+      "billing": 0,
+      "tech": 0,
+      "sales": 1,
+      "logistics": 0
+    },
+    "ok": true,
+    "ms": 526,
+    "err": null
+  },
+  {
+    "text": "想了解下你们的服务范围。",
+    "expect": "sales",
+    "diff": "清晰",
+    "choice": "sales",
+    "conf": 1,
+    "probs": {
+      "logistics": 0,
+      "billing": 0,
+      "sales": 1,
+      "tech": 0
+    },
+    "ok": true,
+    "ms": 525,
+    "err": null
+  },
+  {
+    "text": "要退款，货也没发。",
+    "expect": "billing",
+    "diff": "模糊",
+    "choice": "billing",
+    "conf": 0.98,
+    "probs": {
+      "logistics": 0.02,
+      "tech": 0,
+      "billing": 0.98,
+      "sales": 0
+    },
+    "ok": true,
+    "ms": 528,
+    "err": null
+  },
+  {
+    "text": "报错很久了，顺便能退吗？",
+    "expect": "tech",
+    "diff": "模糊",
+    "choice": "tech",
+    "conf": 0.41,
+    "probs": {
+      "logistics": 0,
+      "sales": 0,
+      "billing": 0.44,
+      "tech": 0.56
+    },
+    "ok": true,
+    "ms": 520,
+    "err": null
+  },
+  {
+    "text": "发票有问题，东西也没收到。",
+    "expect": "billing",
+    "diff": "模糊",
+    "choice": "billing",
+    "conf": 0.5,
+    "probs": {
+      "logistics": 0.38,
+      "sales": 0,
+      "billing": 0.62,
+      "tech": 0
+    },
+    "ok": true,
+    "ms": 525,
+    "err": null
+  },
+  {
+    "text": "服务太差，我要投诉。",
+    "expect": "sales",
+    "diff": "模糊",
+    "choice": "sales",
+    "conf": 0.2,
+    "probs": {
+      "tech": 0.13,
+      "sales": 0.4,
+      "billing": 0.38,
+      "logistics": 0.09
+    },
+    "ok": true,
+    "ms": 424,
+    "err": null
+  },
+  {
+    "text": "怎么升级？登录也不行了。",
+    "expect": "sales",
+    "diff": "模糊",
+    "choice": "tech",
+    "conf": 1,
+    "probs": {
+      "tech": 1,
+      "billing": 0,
+      "logistics": 0,
+      "sales": 0
+    },
+    "ok": false,
+    "ms": 619,
+    "err": null
+  },
+  {
+    "text": "收到货了但是坏的，能退钱吗？",
+    "expect": "logistics",
+    "diff": "模糊",
+    "choice": "billing",
+    "conf": 0.99,
+    "probs": {
+      "tech": 0,
+      "billing": 0.99,
+      "sales": 0,
+      "logistics": 0.01
+    },
+    "ok": false,
+    "ms": 530,
+    "err": null
+  },
+  {
+    "text": "想买，但功能有 bug。",
+    "expect": "sales",
+    "diff": "模糊",
+    "choice": "tech",
+    "conf": 0.5,
+    "probs": {
+      "billing": 0,
+      "tech": 0.63,
+      "logistics": 0,
+      "sales": 0.37
+    },
+    "ok": false,
+    "ms": 523,
+    "err": null
+  },
+  {
+    "text": "东西有质量问题。",
+    "expect": "tech",
+    "diff": "模糊",
+    "choice": "tech",
+    "conf": 0.25,
+    "probs": {
+      "billing": 0.35,
+      "logistics": 0.11,
+      "sales": 0.1,
+      "tech": 0.44
+    },
+    "ok": true,
+    "ms": 530,
+    "err": null
+  },
+  {
+    "text": "退款要多久？另外东西还没发。",
+    "expect": "billing",
+    "diff": "模糊",
+    "choice": "billing",
+    "conf": 0.82,
+    "probs": {
+      "tech": 0,
+      "billing": 0.87,
+      "sales": 0,
+      "logistics": 0.13
+    },
+    "ok": true,
+    "ms": 531,
+    "err": null
+  },
+  {
+    "text": "登录不了，顺便问下有没有企业版。",
+    "expect": "tech",
+    "diff": "模糊",
+    "choice": "tech",
+    "conf": 0.95,
+    "probs": {
+      "tech": 0.96,
+      "logistics": 0,
+      "sales": 0.04,
+      "billing": 0
+    },
+    "ok": true,
+    "ms": 525,
+    "err": null
+  },
+  {
+    "text": "你好。",
+    "expect": "sales",
+    "diff": "边界",
+    "choice": "sales",
+    "conf": 0.98,
+    "probs": {
+      "sales": 0.99,
+      "billing": 0,
+      "tech": 0.01,
+      "logistics": 0
+    },
+    "ok": true,
+    "ms": 510,
+    "err": null
+  },
+  {
+    "text": "在吗",
+    "expect": "sales",
+    "diff": "边界",
+    "choice": "sales",
+    "conf": 0.95,
+    "probs": {
+      "tech": 0.03,
+      "logistics": 0,
+      "sales": 0.97,
+      "billing": 0
+    },
+    "ok": true,
+    "ms": 534,
+    "err": null
+  },
+  {
+    "text": "转人工",
+    "expect": "sales",
+    "diff": "边界",
+    "choice": "tech",
+    "conf": 0.62,
+    "probs": {
+      "tech": 0.71,
+      "sales": 0.25,
+      "logistics": 0.01,
+      "billing": 0.03
+    },
+    "ok": false,
+    "ms": 565,
+    "err": null
+  },
+  {
+    "text": "谢谢",
+    "expect": "sales",
+    "diff": "边界",
+    "choice": "sales",
+    "conf": 0.73,
+    "probs": {
+      "logistics": 0.04,
+      "billing": 0.1,
+      "sales": 0.79,
+      "tech": 0.07
+    },
+    "ok": true,
+    "ms": 484,
+    "err": null
+  },
+  {
+    "text": "test",
+    "expect": "sales",
+    "diff": "边界",
+    "choice": "tech",
+    "conf": 0.82,
+    "probs": {
+      "sales": 0.13,
+      "tech": 0.87,
+      "billing": 0,
+      "logistics": 0
+    },
+    "ok": false,
+    "ms": 527,
+    "err": null
+  },
+  {
+    "text": "...",
+    "expect": "sales",
+    "diff": "边界",
+    "choice": "sales",
+    "conf": 0.31,
+    "probs": {
+      "billing": 0.05,
+      "sales": 0.48,
+      "logistics": 0.07,
+      "tech": 0.4
+    },
+    "ok": true,
+    "ms": 510,
+    "err": null
+  },
+  {
+    "text": "请问地址在哪",
+    "expect": "sales",
+    "diff": "边界",
+    "choice": "logistics",
+    "conf": 0.94,
+    "probs": {
+      "billing": 0,
+      "tech": 0,
+      "sales": 0.04,
+      "logistics": 0.96
+    },
+    "ok": false,
+    "ms": 530,
+    "err": null
+  },
+  {
+    "text": "文档链接给我一下",
+    "expect": "tech",
+    "diff": "边界",
+    "choice": "sales",
+    "conf": 0.63,
+    "probs": {
+      "sales": 0.72,
+      "tech": 0.27,
+      "logistics": 0,
+      "billing": 0.01
+    },
+    "ok": false,
+    "ms": 514,
+    "err": null
+  },
+  {
+    "text": "help",
+    "expect": "sales",
+    "diff": "边界",
+    "choice": "tech",
+    "conf": 0.74,
+    "probs": {
+      "sales": 0.19,
+      "billing": 0,
+      "logistics": 0,
+      "tech": 0.81
+    },
+    "ok": false,
+    "ms": 526,
+    "err": null
+  },
+  {
+    "text": "???",
+    "expect": "sales",
+    "diff": "边界",
+    "choice": "tech",
+    "conf": 0.45,
+    "probs": {
+      "tech": 0.59,
+      "billing": 0.02,
+      "sales": 0.37,
+      "logistics": 0.02
+    },
+    "ok": false,
+    "ms": 553,
+    "err": null
+  }
+]
