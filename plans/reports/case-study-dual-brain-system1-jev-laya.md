@@ -1,12 +1,5 @@
 # CASE STUDY: Kiến Trúc Phân Tầng System 1 Dual-Brain (Laya-MLX & TypeSafe JEV) và Speculative Commit Engine Trong Kỷ Nguyên Agentic AI
 
-> **Tài liệu**: Engineering Case Study, Retrospective & Battle Journal  
-> **Tác giả**: Antigravity Pair-Programming Agent & Jang Trịnh  
-> **Tham vấn & Phản biện**: Codex Native (GPT-6-Astra) & Adversarial Red Team  
-> **Thời gian thực hiện**: 24 – 26 Tháng 9 Năm 2026  
-> **Hệ sinh thái đánh giá**: TypeSafe JEV (`@jev/shared-contract`, `jev-browser-cli`), Laya (`convaiinnovations/laya`, `mizorewww/laya-mlx`), `design-os-generative-ui`, `jang-skills`  
-> **Môi trường phần cứng**: Apple Silicon Mac (M-Series, macOS Sequoia, Unified Memory, Metal Performance Shaders / MLX Metal) & Linux Cloud Edge  
-
 ---
 
 ## Executive Summary (Tóm Tắt Điều Hành)

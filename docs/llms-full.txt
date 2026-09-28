@@ -40,13 +40,6 @@ Sub-10ms Calibrated Judgments for Autonomous Agents with Zero Cloud Waste.
 
 # CASE STUDY: Tiered System 1 Dual-Brain Architecture (Laya-MLX & TypeSafe JEV) and Speculative Commit Engine in the Agentic AI Era
 
-> **Document Type**: Engineering Case Study, Retrospective & Battle Journal  
-> **Authors**: Antigravity Pair-Programming Agent & Jang Trịnh  
-> **Counsel & Adversarial Review**: Codex Native (GPT-6-Astra) & Adversarial Red Team  
-> **Timeline**: September 24 – 26, 2026  
-> **Evaluated Ecosystem**: TypeSafe JEV (`@jev/shared-contract`, `jev-browser-cli`), Laya (`convaiinnovations/laya`, `mizorewww/laya-mlx`), `design-os-generative-ui`, `jang-skills`  
-> **Hardware Environment**: Apple Silicon Mac (M-Series, macOS Sequoia, Unified Memory, Metal Performance Shaders / MLX Metal Graph) & Linux Cloud Edge  
-
 ---
 
 ## Executive Summary
