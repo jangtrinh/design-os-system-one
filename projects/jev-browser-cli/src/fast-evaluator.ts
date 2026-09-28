@@ -289,12 +289,13 @@ export class FastEvaluator {
           type: "choice",
           instructions: "Select the single best next action to advance toward the goal.",
           criteria,
+          min_confidence: 0.30,
         },
       },
     });
 
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 60);
+    const timeoutId = setTimeout(() => controller.abort(), 180);
 
     try {
       const resp = await fetch("http://127.0.0.1:8000/predict", {
@@ -310,8 +311,19 @@ export class FastEvaluator {
       const answer = data?.answers?.action_decision;
       if (!answer) return null;
 
+      // Laya v0.3.21: Check for opt-in abstention
+      if (answer.low_confidence || answer.choice === null) {
+        return null; // Model safely abstained; escalate to JEV Cloud
+      }
+
       const choice = answer.choice || "";
-      const confidence = typeof answer.confidence === "number" ? answer.confidence : 0.85;
+      // Laya v0.3.21: Prioritize calibrated answer_confidence over entropy-based confidence
+      const confidence =
+        typeof answer.answer_confidence === "number"
+          ? answer.answer_confidence
+          : typeof answer.confidence === "number"
+          ? answer.confidence
+          : 0.85;
 
       if (choice === "done") {
         return {

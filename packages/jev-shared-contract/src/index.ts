@@ -268,3 +268,11 @@ export * from "./token-estimator.js";
 export * from "./identity.js";
 export * from "./cache-storage.js";
 export * from "./concurrency.js";
+
+// -------------------------------------------------------------
+// Milestone 7: Ecosystem Expansion (Multi-Agent Swarm & Safety)
+// -------------------------------------------------------------
+export * from "./agent-router.js";
+export * from "./guardrail.js";
+export * from "./shortlist.js";
+
