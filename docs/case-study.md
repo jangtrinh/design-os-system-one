@@ -285,6 +285,9 @@ To prevent future agent sessions and developers from repeating past errors, the 
 
 As of late September 2026, the System One paradigm has evolved from standalone classification into an end-to-end **Agent Operating Infrastructure**. In this release, our ecosystem adds 5 critical capabilities:
 
+![Autonomous Multi-Agent Swarm Router and Penetration-Hardened Defense Chassis](images/swarm-security-chassis.png)
+*Figure 7.1: Master Swarm Architecture — Penetration-hardened security firewall base, cascade & shortlist optical prism, and multi-agent specialist delegation array.*
+
 ### 1. Hierarchical Multi-Agent Swarm Router (`HierarchicalAgentRouter`)
 In multi-agent architectures (CrewAI, LangGraph, AutoGen), traditional "Manager Agents" waste 2,000–4,000ms and substantial token costs just deciding which worker should handle an incoming subtask. Our new `HierarchicalAgentRouter` solves this at the System One layer:
 - **Sub-35ms Task Delegation**: Matches task requirements against worker profiles (`role`, `goal`, `capabilities`) in a single forward pass.
