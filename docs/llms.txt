@@ -26,5 +26,11 @@ Sub-10ms Calibrated Judgments for Autonomous Agents with Zero Cloud Waste.
   - Models cannot unilaterally close tasks; task completion requires 100% acceptance test proof (`VERIFY_AND_STOP`).
 - **Cryptographic exactCache**:
   - All Gateway Router and Skill Pruner cache keys use SHA-256 over canonical JSON to prevent cross-prompt collision exploits.
+- **Enterprise Swarm & Penetration-Hardened Security**:
+  - `PreExecutionGuardrail`: <2ms pre-dispatch threat firewall intercepting zero-width obfuscation, pipe-to-shell RCE, DAN jailbreaks, and credential leaks (33/33 penetration tests passing).
+  - `HierarchicalAgentRouter`: Sub-35ms specialist delegation replacing slow 3,000ms LLM managers with calibrated Softmax and opt-in abstention (`min_confidence: 0.30`).
+  - `HighCardinalityShortlist`: Filters 1,000+ candidates down to top-10 in 3.6ms, preventing head token overflow (`head_max_len`).
+  - `Browser Reflex Head`: 17–23ms step latency (200x faster than 27B LLMs) for autonomous DOM navigation.
 - **Air-Gapped Privacy (`localOnly: true`)**:
   - Strictly forbids WAN cloud calls, guaranteeing zero telemetry and zero external data leaks.
+
