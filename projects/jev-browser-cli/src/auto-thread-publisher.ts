@@ -22,7 +22,7 @@ Zero manual sculpting. Evidence-bound engineering. 3/4`,
     ]
   },
   {
-    text: `The entire project—native .blend files, KiCad schematics, STL print kit, and verification receipts—is 100% open source.
+    text: `The entire project—native .blend files, KiCad schematics, STL print kit, and verification receipts—is public on GitHub (source-available).
 
 Do you think AI agents will replace CAD engineers in 3 years, or just become our fastest copilots?
 

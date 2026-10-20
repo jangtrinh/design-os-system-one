@@ -1,6 +1,6 @@
 ---
 name: typesafe-ai
-license: MIT
+license: PolyForm Shield 1.0.0 (see LICENSE)
 description: >
   Build AI-powered software with TypeSafe: small units of AI intelligence you
   can use like programming primitives. Its System One models, including Jev,

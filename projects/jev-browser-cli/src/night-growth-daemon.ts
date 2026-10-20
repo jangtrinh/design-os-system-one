@@ -34,7 +34,7 @@ const ROBOT_ARM_CARD2 = `To prevent layer delamination under torsional load:
 2. Motor mounts feature integrated heatsink airflow channels
 3. Every STL is auto-oriented for supportless printing
 
-Open-source .blend CAD models & print plates:
+Source-available .blend CAD models & print plates:
 github.com/jangtrinh/design-os-3d-blender
 
 What's the hardest mechanical challenge you've hit when 3D printing functional robotics?`;

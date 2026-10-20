@@ -34,7 +34,7 @@ Here is how we organized a full 6-DOF robotic arm across 5 build plates on a sta
 • 14 CNC metal rods taking bending moments off servos
 • 328 M3/M4 fasteners verified for clearance
 
-Explore our open-source pipeline & interactive 3D review:
+Explore our source-available pipeline & interactive 3D review:
 https://jangtrinh.github.io/design-os-3d-blender/
 
 PETG or ASA for structural arms? 👇`
@@ -390,7 +390,7 @@ export class HumanAutonomousGrowthDaemon {
     const commentTemplates = [
       `Really solid mechanical approach! When dealing with torsional loads and layer adhesion, we found that keeping joint rotational axes parallel to the print bed and isolating bending moments with dual ball-bearings prevents layer sheer completely.
 
-We open-sourced our native Blender CAD verification pipeline and 3D review tools here if you want to inspect the geometry tests: https://jangtrinh.github.io/design-os-3d-blender/`,
+We published the source of our native Blender CAD verification pipeline and 3D review tools here if you want to inspect the geometry tests: https://jangtrinh.github.io/design-os-3d-blender/`,
 
       `Spot on observation. For functional 3D printed mechanical housings, standard heat-set brass inserts (ISO 273 Medium series) with ray-cast verified radial wall stock make a massive difference in preventing fatigue cracks over time.
 
@@ -398,7 +398,7 @@ We documented the full procedural clearance rules and interactive 3D review mode
 
       `Great engineering trade-off! Balancing part orientation against nozzle shear planes is the hardest part of functional prototypes. We run automated clearance gates directly in Blender Python before exporting print plates to catch interference early.
 
-You can check out our open-source CAD pipeline and interactive 3D models here: https://jangtrinh.github.io/design-os-3d-blender/`
+You can check out our source-available CAD pipeline and interactive 3D models here: https://jangtrinh.github.io/design-os-3d-blender/`
     ];
 
     const commentText = commentTemplates[Math.floor(Math.random() * commentTemplates.length)];

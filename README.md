@@ -6,7 +6,7 @@
 [![CI Status](https://img.shields.io/badge/CI-Passing-brightgreen?style=for-the-badge)](https://github.com/jangtrinh/design-os-system-one/actions)
 [![Pen--Test](https://img.shields.io/badge/Pen--Test-Hardened%20(33%2F33)-success?style=for-the-badge)](https://github.com/jangtrinh/design-os-system-one/blob/main/packages/jev-shared-contract/test/pen-test-adversarial.test.ts)
 [![Laya Engine](https://img.shields.io/badge/Laya--Core-v0.3.21%20ONNX--INT8-blue?style=for-the-badge)](https://github.com/NandhaKishorM/laya)
-[![License: MIT](https://img.shields.io/badge/license-MIT-informational?style=for-the-badge)](https://github.com/jangtrinh/design-os-system-one/blob/main/LICENSE)
+[![License: PolyForm Shield 1.0.0](https://img.shields.io/badge/license-PolyForm_Shield_1.0.0-informational?style=for-the-badge)](https://github.com/jangtrinh/design-os-system-one/blob/main/LICENSE)
 [![Local First](https://img.shields.io/badge/local--first-6.53ms%20P50-success?style=for-the-badge)](https://jangtrinh.github.io/design-os-system-one/)
 [![Zero Telemetry](https://img.shields.io/badge/telemetry-zero-202020?style=for-the-badge)](https://jangtrinh.github.io/design-os-system-one/)
 
@@ -217,4 +217,6 @@ console.log(pruned.retainedCount); // -> 10 candidates (99% reduction, Zero head
 
 ## 📄 License
 
-MIT License. Designed and maintained by [Jang Trịnh](https://github.com/jangtrinh).
+[PolyForm Shield 1.0.0](LICENSE): free to use and modify; no resale and no competing products. Designed and maintained by [Jang Trịnh](https://github.com/jangtrinh).
+
+Folders that ship their own `LICENSE` file (`packages/laya-mlx`, `projects/laya-jev-lab`) and the Laya model weights keep their own upstream terms.
