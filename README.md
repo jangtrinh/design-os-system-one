@@ -215,6 +215,12 @@ console.log(pruned.retainedCount); // -> 10 candidates (99% reduction, Zero head
 
 ---
 
+## Author
+
+Built by [Jang Trịnh](https://www.jang.work/?utm_source=github&utm_medium=readme&utm_campaign=design-os-system-one). More projects, case studies and writing at [jang.work](https://www.jang.work/?utm_source=github&utm_medium=readme&utm_campaign=design-os-system-one).
+
+---
+
 ## 📄 License
 
 [PolyForm Shield 1.0.0](LICENSE): free to use and modify; no resale and no competing products. Designed and maintained by [Jang Trịnh](https://github.com/jangtrinh).
